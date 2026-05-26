@@ -684,6 +684,19 @@ function init() {
   window.addEventListener('online', updateOffline);
   window.addEventListener('offline', updateOffline);
   updateOffline();
+  // Hash routing
+  window.addEventListener('hashchange', handleHashChange);
+  handleHashChange();
+}
+
+function handleHashChange() {
+  const hash = window.location.hash.replace('#', '');
+  if (hash && !isNaN(hash) && +hash >= 1 && +hash <= 114) {
+    const num = parseInt(hash);
+    if (num !== currentSurah) {
+      loadSurah(num);
+    }
+  }
 }
 
 function populateLangSelect() {
@@ -1026,6 +1039,10 @@ function loadIndex() {
 
 async function loadSurah(num, highlightAyah) {
   currentSurah = num;
+  const hash = '#' + num;
+  if (window.location.hash !== hash) {
+    window.location.hash = hash;
+  }
   const surah = SURAHS.find(s => s.n === num);
   const name = surah ? surah.a : `Surah ${num}`;
   document.getElementById('headerTitle').textContent = name;
