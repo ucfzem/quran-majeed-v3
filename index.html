@@ -2,7 +2,7 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
   <title>القرآن الكريم - Quran Majeed</title>
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#004d40">
@@ -12,9 +12,8 @@
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
-      --ayah-size: clamp(1.3rem, 4vw, 2.4rem);
-      --translation-size: clamp(0.8rem, 2vw, 1.1rem);
-      --container-max: min(950px, 95vw);
+      --ayah-size: 1.8rem;
+      --translation-size: 0.95rem;
       --primary: #00695c;
       --primary-dark: #004d40;
       --primary-light: #4db6ac;
@@ -26,7 +25,6 @@
       --text-secondary: #555;
       --border: #e0e0e0;
       --radius: 14px;
-      --header-h: 60px;
     }
     body.dark {
       --primary: #1b5e20;
@@ -51,7 +49,7 @@
 
     /* ─── HEADER ─── */
     header {
-      position: fixed; top: 0; left: 0; right: 0; height: var(--header-h);
+      position: fixed; top: 0; left: 0; right: 0; height: 60px;
       background: var(--primary-dark); color: white;
       display: flex; align-items: center; justify-content: space-between;
       padding: 0 12px; z-index: 1000; gap: 6px;
@@ -66,8 +64,7 @@
     .btn:hover { background: rgba(255,255,255,0.15); }
 
     .header-title {
-      font-size: clamp(0.85rem, 2.5vw, 1.2rem);
-      font-weight: bold; flex: 1;
+      font-size: 1rem; font-weight: bold; flex: 1;
       text-align: center; white-space: nowrap; overflow: hidden;
       text-overflow: ellipsis; margin: 0 4px;
     }
@@ -75,7 +72,7 @@
     #langSelect {
       background: rgba(255,255,255,0.15); color: white;
       border: 1px solid rgba(255,255,255,0.3);
-      border-radius: 8px; padding: 6px 8px; font-size: clamp(0.65rem, 1.5vw, 0.85rem);
+      border-radius: 8px; padding: 6px 8px; font-size: 0.8rem;
       cursor: pointer; max-width: 90px;
     }
     #langSelect option { background: #333; color: white; }
@@ -131,24 +128,19 @@
     .surah-item .surah-name-ar { font-family: 'Amiri', serif; font-size: 1.1rem; }
     .surah-item .surah-name-en { font-size: 0.85rem; opacity: 0.7; text-align: left; }
 
-    @media (min-width: 768px) {
-      .sidebar { width: 380px; right: -380px; }
-    }
-
     /* ─── MAIN ─── */
     .container {
-      padding: calc(var(--header-h) + 16px) 12px 100px;
-      max-width: var(--container-max); margin: 0 auto;
+      padding: 76px 12px 100px; max-width: 950px; margin: 0 auto;
     }
 
     .welcome {
-      text-align: center; margin-top: 60px; padding: 0 12px;
+      text-align: center; margin-top: 80px; padding: 0 20px;
       font-family: 'Inter', sans-serif;
     }
-    .welcome-icon { font-size: clamp(3rem, 8vw, 5rem); margin-bottom: 16px; }
-    .welcome h2 { font-size: clamp(1.4rem, 4vw, 2.2rem); color: var(--primary); margin-bottom: 12px; }
+    .welcome-icon { font-size: 4rem; margin-bottom: 16px; }
+    .welcome h2 { font-size: 1.8rem; color: var(--primary); margin-bottom: 12px; }
     body.dark .welcome h2 { color: var(--primary-light); }
-    .welcome p { color: var(--text-secondary); font-size: clamp(0.85rem, 2vw, 1.05rem); line-height: 1.6; }
+    .welcome p { color: var(--text-secondary); font-size: 1rem; line-height: 1.6; }
 
     .features-grid {
       display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
@@ -165,7 +157,7 @@
 
     /* ─── SURAH VIEW ─── */
     .surah-container {
-      background: var(--bg-card); padding: clamp(20px, 3vw, 40px) clamp(12px, 2vw, 28px);
+      background: var(--bg-card); padding: 28px 16px;
       border-radius: var(--radius); margin-bottom: 20px;
       box-shadow: 0 2px 12px rgba(0,0,0,0.06);
     }
@@ -174,13 +166,13 @@
       text-align: center; margin-bottom: 28px;
       padding-bottom: 20px; border-bottom: 3px solid var(--primary);
     }
-    .surah-header h2 { font-size: clamp(1.5rem, 4vw, 2.5rem); color: var(--primary); margin-bottom: 4px; }
+    .surah-header h2 { font-size: 2rem; color: var(--primary); margin-bottom: 4px; }
     body.dark .surah-header h2 { color: var(--primary-light); }
-    .surah-header .sub { font-size: clamp(0.8rem, 1.8vw, 1rem); color: var(--text-secondary); font-family: 'Inter', sans-serif; }
+    .surah-header .sub { font-size: 0.9rem; color: var(--text-secondary); font-family: 'Inter', sans-serif; }
 
     /* ─── AYAH BLOCK ─── */
     .ayah-block {
-      margin-bottom: 18px; padding: clamp(8px, 1.5vw, 16px) clamp(10px, 1.5vw, 20px);
+      margin-bottom: 18px; padding: 12px 14px;
       border-radius: 10px; transition: background 0.2s;
     }
     .ayah-block:hover { background: rgba(0,105,92,0.04); }
@@ -205,10 +197,9 @@
 
     .ayah-num {
       display: inline-flex; align-items: center; justify-content: center;
-      width: clamp(28px, 4vw, 40px); height: clamp(28px, 4vw, 40px);
-      margin: 0 4px;
+      width: 36px; height: 36px; margin: 0 4px;
       vertical-align: middle; font-family: Arial, sans-serif;
-      font-weight: bold; font-size: clamp(0.7rem, 1.5vw, 0.9rem);
+      font-weight: bold; font-size: 0.85rem;
       color: #5c4000;
       background: radial-gradient(circle at 30% 30%, #fff8e1, var(--gold-light), var(--gold));
       border: 2px solid #b8860b; border-radius: 50%;
@@ -223,10 +214,9 @@
       font-family: 'Inter', sans-serif;
     }
     .nav-btn {
-      flex: 1; padding: clamp(10px, 1.5vw, 16px) clamp(8px, 1.5vw, 14px);
-      background: var(--primary);
+      flex: 1; padding: 14px 10px; background: var(--primary);
       color: white; border: none; border-radius: 10px;
-      cursor: pointer; font-size: clamp(0.8rem, 1.8vw, 1rem); font-weight: 600;
+      cursor: pointer; font-size: 0.95rem; font-weight: 600;
       transition: background 0.2s, transform 0.1s;
     }
     .nav-btn:active { transform: scale(0.97); }
@@ -329,56 +319,6 @@
       font-family: 'Inter', sans-serif; margin-left: 8px;
     }
 
-    /* ─── DONATION / FOOTER ─── */
-    .donation-section {
-      text-align: center; padding: 30px 16px 20px;
-      margin-top: 30px;
-      border-top: 2px solid var(--border);
-      font-family: 'Inter', sans-serif;
-    }
-    .donation-section p {
-      color: var(--text-secondary); font-size: 0.9rem;
-      margin-bottom: 16px;
-    }
-    .donation-buttons {
-      display: flex; flex-wrap: wrap; gap: 12px;
-      justify-content: center; align-items: center;
-    }
-    .donation-btn {
-      display: inline-flex; align-items: center; gap: 8px;
-      padding: 12px 24px; border: none; border-radius: 10px;
-      font-size: 0.95rem; font-weight: 600; cursor: pointer;
-      text-decoration: none; transition: transform 0.2s, opacity 0.2s;
-    }
-    .donation-btn:hover { transform: translateY(-2px); opacity: 0.9; }
-    .donation-btn:active { transform: scale(0.97); }
-    .donation-btn.paypal {
-      background: #0070ba; color: white;
-    }
-    .donation-btn.bmc {
-      background: #FFDD00; color: #333;
-    }
-    .donation-btn.kofi {
-      background: #13c5ff; color: white;
-    }
-
-    /* ─── AD PLACEHOLDER ─── */
-    .ad-container {
-      text-align: center; overflow: hidden;
-      margin: 16px auto; padding: 8px;
-      max-width: var(--container-max);
-    }
-    .ad-banner {
-      background: var(--bg-card); border: 1px dashed var(--border);
-      border-radius: 8px; padding: 16px;
-      color: var(--text-secondary); font-family: 'Inter', sans-serif;
-      font-size: 0.8rem; min-height: 60px;
-      display: flex; align-items: center; justify-content: center;
-    }
-    .ad-banner.responsive {
-      min-height: 90px;
-    }
-
     /* ─── SCROLLBAR ─── */
     ::-webkit-scrollbar { width: 5px; }
     ::-webkit-scrollbar-track { background: transparent; }
@@ -386,82 +326,19 @@
 
     /* ─── OFFLINE BANNER ─── */
     .offline-banner {
-      position: fixed; top: var(--header-h); left: 0; right: 0; z-index: 997;
+      position: fixed; top: 60px; left: 0; right: 0; z-index: 997;
       background: #d32f2f; color: white; text-align: center;
       padding: 6px 12px; font-size: 0.82rem; font-family: 'Inter', sans-serif;
       transform: translateY(-100%); transition: transform 0.3s;
     }
     .offline-banner.show { transform: translateY(0); }
 
-    /* ─── RESPONSIVE: TABLETS ─── */
-    @media (min-width: 768px) {
-      :root {
-        --ayah-size: clamp(1.6rem, 3.5vw, 2.2rem);
-        --translation-size: clamp(0.85rem, 1.8vw, 1rem);
-        --container-max: min(900px, 92vw);
-      }
-      .container { padding: calc(var(--header-h) + 24px) 24px 120px; }
-      .surah-container { padding: 32px 24px; }
-      .sidebar { width: 380px; right: -380px; }
-      .donation-btn { padding: 14px 28px; font-size: 1rem; }
-    }
-
-    /* ─── RESPONSIVE: DESKTOP / LAPTOP ─── */
-    @media (min-width: 1024px) {
-      :root {
-        --ayah-size: clamp(1.8rem, 3vw, 2.4rem);
-        --translation-size: clamp(0.9rem, 1.5vw, 1.05rem);
-        --container-max: min(950px, 85vw);
-      }
-      .container { padding: calc(var(--header-h) + 32px) 32px 140px; }
-      .surah-container { padding: 40px 32px; }
-      .surah-header { margin-bottom: 36px; padding-bottom: 24px; }
-      .ayah-block { margin-bottom: 22px; padding: 14px 20px; }
-      .nav-buttons { gap: 16px; }
-    }
-
-    /* ─── RESPONSIVE: TV / LARGE SCREENS ─── */
-    @media (min-width: 1440px) {
-      :root {
-        --ayah-size: clamp(2rem, 2.5vw, 2.6rem);
-        --translation-size: clamp(0.95rem, 1.2vw, 1.1rem);
-        --container-max: min(1000px, 75vw);
-      }
-      .container { padding: calc(var(--header-h) + 40px) 40px 160px; }
-      .surah-container { padding: 48px 40px; border-radius: 18px; }
-      .surah-header { margin-bottom: 44px; padding-bottom: 28px; }
-      .ayah-block { margin-bottom: 26px; padding: 16px 24px; border-radius: 12px; }
-      .nav-buttons { gap: 20px; margin-top: 36px; padding-top: 28px; }
-      .nav-btn { font-size: 1.05rem; padding: 18px 16px; border-radius: 12px; }
-    }
-
-    /* ─── RESPONSIVE: 4K / ULTRA-WIDE ─── */
-    @media (min-width: 2000px) {
-      :root {
-        --ayah-size: clamp(2.2rem, 2vw, 3rem);
-        --translation-size: 1.1rem;
-        --container-max: min(1100px, 65vw);
-      }
-    }
-
     @media (max-width: 480px) {
+      :root { --ayah-size: 1.5rem; --translation-size: 0.85rem; }
       .sidebar { width: 100%; right: -100%; }
       .surah-container { padding: 20px 12px; }
       .nav-btn { font-size: 0.85rem; padding: 12px 6px; }
       #langSelect { max-width: 70px; font-size: 0.7rem; }
-    }
-
-    @media (max-width: 360px) {
-      :root { --ayah-size: 1.2rem; }
-      .header-title { font-size: 0.75rem; }
-      .btn { font-size: 1.1rem; padding: 6px 6px; }
-    }
-
-    @media (orientation: landscape) and (max-height: 500px) {
-      :root { --header-h: 48px; --ayah-size: 1.1rem; }
-      .container { padding-top: calc(var(--header-h) + 8px); }
-      .surah-container { padding: 12px 10px; }
-      .ayah-block { margin-bottom: 8px; padding: 6px 8px; }
     }
   </style>
 </head>
@@ -500,14 +377,6 @@
   <div class="search-modal-results" id="searchResults"></div>
 </div>
 
-<!-- AD BANNER (TOP) -->
-<div class="ad-container">
-  <div class="ad-banner responsive" id="adTop">
-    <!-- 🔧 Remplacez ceci par votre code AdSense ou autre -->
-    <span>📢 Espace publicitaire disponible — <a href="#donate" style="color:var(--primary)">Soutenez le projet</a></span>
-  </div>
-</div>
-
 <!-- MAIN -->
 <div class="container" id="mainContent">
   <div class="welcome">
@@ -523,35 +392,8 @@
   </div>
 </div>
 
-<!-- AD BANNER (BOTTOM) -->
-<div class="ad-container" style="max-width:var(--container-max);margin:0 auto 20px">
-  <div class="ad-banner responsive" id="adBottom">
-    <!-- 🔧 Remplacez ceci par votre code AdSense ou autre -->
-    <span>📢 Espace publicitaire — <a href="#donate" style="color:var(--primary)">Supprimez les pubs en faisant un don</a></span>
-  </div>
-</div>
-
-<!-- DONATION SECTION -->
-<div class="donation-section" id="donate">
-  <p>🤲 Soutenez ce projet — Jazakallah Khair</p>
-  <div class="donation-buttons">
-    <a class="donation-btn paypal" href="https://www.paypal.com/donate/?hosted_button_id=VOTRE_ID" target="_blank" rel="noopener">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M7.076 21.337H2.47a.641.641 0 0 1-.633-.74L4.944.901C5.026.382 5.474 0 5.998 0h7.46c2.57 0 4.578.543 5.69 1.81 1.01 1.15 1.304 2.42 1.012 4.287-.023.143-.047.288-.077.437-.983 5.05-4.349 6.797-8.647 6.797h-2.19c-.524 0-.968.382-1.05.9l-1.12 7.106z"/></svg>
-      PayPal
-    </a>
-    <a class="donation-btn bmc" href="https://www.buymeacoffee.com/VOTRE_USER" target="_blank" rel="noopener">
-      ☕ Buy Me a Coffee
-    </a>
-    <a class="donation-btn kofi" href="https://ko-fi.com/VOTRE_USER" target="_blank" rel="noopener">
-      🎁 Ko-fi
-    </a>
-  </div>
-  <p style="margin-top:12px;font-size:0.8rem;opacity:0.6">
-    QR Code: ${VOTRE_ADRESSE_CRYPTO}
-  </p>
-</div>
-
 <script>
+
 // ═══════════════════════════════════════════════
 //  LANGUAGES
 // ═══════════════════════════════════════════════
@@ -570,7 +412,7 @@ const LANGUAGES = [
   { code: 'it.piccardo',   label: '🇮🇹 Italiano',             ui: 'it' },
   { code: 'nl.keyzer',     label: '🇳🇱 Nederlands',           ui: 'nl' },
   { code: 'pl.bielawskiego',label: '🇵🇱 Polski',              ui: 'pl' },
-  { code: 'sv.bernstein',  label: '🇸🇪 Svenska',              ui: 'sv' },
+  { code: 'sv.bernstrom',  label: '🇸🇪 Svenska',              ui: 'sv' },
   { code: 'bn.bengali',    label: '🇧🇩 বাংলা (Bengali)',      ui: 'bn' },
   { code: 'zh.jianxin',    label: '🇨🇳 中文 (Chinese)',        ui: 'zh' },
   { code: 'hi.farooq',     label: '🇮🇳 हिन्दी (Hindi)',       ui: 'hi' },
@@ -1259,7 +1101,7 @@ async function loadSurah(num, highlightAyah) {
       }
     }
 
-    if (highlightAyah) {
+      if (highlightAyah) {
       setTimeout(() => {
         const el = document.getElementById(`ayah-${highlightAyah}`);
         if (el) {
@@ -1287,10 +1129,11 @@ async function loadSurah(num, highlightAyah) {
     container.innerHTML = `
       <div class="error-box">
         <h3>${getUI('errorTitle')}</h3>
-        <p>${getUI('errorConn')}</p>
-        <button class="retry-btn" onclick="loadSurah(${num})">${getUI('retry')}</button>
+        <p>${err.name === 'AbortError' ? '⏱ ' + getUI('errorConn') : '🔌 ' + getUI('errorConn')}</p>
+        <button class="retry-btn" onclick="loadSurah(${num}${highlightAyah ? ',' + highlightAyah : ''})">${getUI('retry')}</button>
         <button class="retry-btn sec" onclick="toggleSidebar()">${getUI('index')}</button>
-      </div>`;
+      </div>
+    `;
   }
 }
 
@@ -1301,16 +1144,52 @@ async function loadSurah(num, highlightAyah) {
 function toggleTheme() {
   document.body.classList.toggle('dark');
   const isDark = document.body.classList.contains('dark');
-  localStorage.setItem('quranTheme', isDark ? 'dark' : 'light');
   document.getElementById('themeBtn').textContent = isDark ? '☀️' : '🌙';
+  localStorage.setItem('quranTheme', isDark ? 'dark' : 'light');
 }
+
+// ═══════════════════════════════════════════════
+//  PINCH ZOOM
+// ═══════════════════════════════════════════════
+
+function getDist(t1, t2) {
+  return Math.hypot(t1.clientX - t2.clientX, t1.clientY - t2.clientY);
+}
+
+document.addEventListener('touchstart', e => {
+  if (e.touches.length === 2) touchStartDist = getDist(e.touches[0], e.touches[1]);
+}, { passive: true });
+
+document.addEventListener('touchmove', e => {
+  if (e.touches.length === 2) {
+    e.preventDefault();
+    const dist = getDist(e.touches[0], e.touches[1]);
+    const delta = (dist - touchStartDist) * 0.005;
+    fontSize += delta;
+    transSize += delta * 0.45;
+    fontSize = Math.max(1.2, Math.min(3.5, fontSize));
+    transSize = Math.max(0.6, Math.min(1.8, transSize));
+    document.documentElement.style.setProperty('--ayah-size', fontSize + 'rem');
+    document.documentElement.style.setProperty('--translation-size', transSize + 'rem');
+    touchStartDist = dist;
+  }
+}, { passive: false });
 
 // ═══════════════════════════════════════════════
 //  START
 // ═══════════════════════════════════════════════
 
-init();
-preloadQuranData();
+window.onload = function() {
+  init();
+  preloadQuranData();
+
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js?v=4').catch(function() {});
+    navigator.serviceWorker.getRegistrations().then(function(regs) {
+      regs.forEach(function(r) { r.update(); });
+    });
+  }
+};
 </script>
 </body>
 </html>
