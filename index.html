@@ -329,6 +329,39 @@
       font-family: 'Inter', sans-serif; margin-left: 8px;
     }
 
+    /* ─── DONATION / FOOTER ─── */
+    .donation-section {
+      text-align: center; padding: 30px 16px 20px;
+      margin-top: 30px;
+      border-top: 2px solid var(--border);
+      font-family: 'Inter', sans-serif;
+    }
+    .donation-section p {
+      color: var(--text-secondary); font-size: 0.9rem;
+      margin-bottom: 16px;
+    }
+    .donation-buttons {
+      display: flex; flex-wrap: wrap; gap: 12px;
+      justify-content: center; align-items: center;
+    }
+    .donation-btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 12px 24px; border: none; border-radius: 10px;
+      font-size: 0.95rem; font-weight: 600; cursor: pointer;
+      text-decoration: none; transition: transform 0.2s, opacity 0.2s;
+    }
+    .donation-btn:hover { transform: translateY(-2px); opacity: 0.9; }
+    .donation-btn:active { transform: scale(0.97); }
+    .donation-btn.paypal {
+      background: #0070ba; color: white;
+    }
+    .donation-btn.bmc {
+      background: #FFDD00; color: #333;
+    }
+    .donation-btn.kofi {
+      background: #13c5ff; color: white;
+    }
+
     /* ─── AD PLACEHOLDER ─── */
     .ad-container {
       text-align: center; overflow: hidden;
@@ -370,7 +403,8 @@
       .container { padding: calc(var(--header-h) + 24px) 24px 120px; }
       .surah-container { padding: 32px 24px; }
       .sidebar { width: 380px; right: -380px; }
-      }
+      .donation-btn { padding: 14px 28px; font-size: 1rem; }
+    }
 
     /* ─── RESPONSIVE: DESKTOP / LAPTOP ─── */
     @media (min-width: 1024px) {
@@ -470,7 +504,7 @@
 <div class="ad-container">
   <div class="ad-banner responsive" id="adTop">
     <!-- 🔧 Remplacez ceci par votre code AdSense ou autre -->
-    <span>📖 Quran Majeed - القرآن الكريم</span>
+    <span>📢 Espace publicitaire disponible — <a href="#donate" style="color:var(--primary)">Soutenez le projet</a></span>
   </div>
 </div>
 
@@ -493,12 +527,707 @@
 <div class="ad-container" style="max-width:var(--container-max);margin:0 auto 20px">
   <div class="ad-banner responsive" id="adBottom">
     <!-- 🔧 Remplacez ceci par votre code AdSense ou autre -->
-    <span>📖 Quran Majeed - القرآن الكريم</span>
+    <span>📢 Espace publicitaire — <a href="#donate" style="color:var(--primary)">Supprimez les pubs en faisant un don</a></span>
   </div>
 </div>
 
+<!-- DONATION SECTION -->
+<div class="donation-section" id="donate">
+  <p>🤲 Soutenez ce projet — Jazakallah Khair</p>
+  <div class="donation-buttons">
+    <a class="donation-btn paypal" href="https://www.paypal.com/donate/?hosted_button_id=VOTRE_ID" target="_blank" rel="noopener">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M7.076 21.337H2.47a.641.641 0 0 1-.633-.74L4.944.901C5.026.382 5.474 0 5.998 0h7.46c2.57 0 4.578.543 5.69 1.81 1.01 1.15 1.304 2.42 1.012 4.287-.023.143-.047.288-.077.437-.983 5.05-4.349 6.797-8.647 6.797h-2.19c-.524 0-.968.382-1.05.9l-1.12 7.106z"/></svg>
+      PayPal
+    </a>
+    <a class="donation-btn bmc" href="https://www.buymeacoffee.com/VOTRE_USER" target="_blank" rel="noopener">
+      ☕ Buy Me a Coffee
+    </a>
+    <a class="donation-btn kofi" href="https://ko-fi.com/VOTRE_USER" target="_blank" rel="noopener">
+      🎁 Ko-fi
+    </a>
+  </div>
+  <p style="margin-top:12px;font-size:0.8rem;opacity:0.6">
+    QR Code: ${VOTRE_ADRESSE_CRYPTO}
+  </p>
+</div>
 
-`;
+<script>
+// ═══════════════════════════════════════════════
+//  LANGUAGES
+// ═══════════════════════════════════════════════
+
+const LANGUAGES = [
+  { code: 'en.sahih',      label: '🇺🇸 English (Saheeh)',     ui: 'en' },
+  { code: 'fr.hamidullah', label: '🇫🇷 Français',             ui: 'fr' },
+  { code: 'es.cortes',     label: '🇪🇸 Español',              ui: 'es' },
+  { code: 'ar',            label: '🇸🇦 العربية (Arabic)',     ui: 'ar' },
+  { code: 'ur.jalandhry',  label: '🇵🇰 اردو (Urdu)',          ui: 'ur' },
+  { code: 'id.indonesian', label: '🇮🇩 Indonesia',            ui: 'id' },
+  { code: 'tr.ates',       label: '🇹🇷 Türkçe',               ui: 'tr' },
+  { code: 'de.aburida',    label: '🇩🇪 Deutsch',              ui: 'de' },
+  { code: 'ru.kuliev',     label: '🇷🇺 Русский',              ui: 'ru' },
+  { code: 'pt.elhayek',    label: '🇵🇹 Português',            ui: 'pt' },
+  { code: 'it.piccardo',   label: '🇮🇹 Italiano',             ui: 'it' },
+  { code: 'nl.keyzer',     label: '🇳🇱 Nederlands',           ui: 'nl' },
+  { code: 'pl.bielawskiego',label: '🇵🇱 Polski',              ui: 'pl' },
+  { code: 'sv.bernstein',  label: '🇸🇪 Svenska',              ui: 'sv' },
+  { code: 'bn.bengali',    label: '🇧🇩 বাংলা (Bengali)',      ui: 'bn' },
+  { code: 'zh.jianxin',    label: '🇨🇳 中文 (Chinese)',        ui: 'zh' },
+  { code: 'hi.farooq',     label: '🇮🇳 हिन्दी (Hindi)',       ui: 'hi' },
+  { code: 'ja.japanese',   label: '🇯🇵 日本語 (Japanese)',    ui: 'ja' },
+  { code: 'ta.tamil',      label: '🇮🇳 தமிழ் (Tamil)',        ui: 'ta' },
+  { code: 'ml.abdulhameed',label: '🇮🇳 മലയാളം (Malayalam)',   ui: 'ml' },
+  { code: 'th.thai',       label: '🇹🇭 ไทย (Thai)',           ui: 'th' },
+  { code: 'sw.barwani',    label: '🇹🇿 Kiswahili',            ui: 'sw' },
+  { code: 'so.ambark',     label: '🇸🇴 Soomaali',             ui: 'so' },
+  { code: 'ha.gumi',       label: '🇳🇬 Hausa',                ui: 'ha' },
+  { code: 'am.sadiq',      label: '🇪🇹 አማርኛ (Amharic)',      ui: 'am' },
+  { code: 'ku.bamoki',     label: '🇹🇷 Kurdî',                ui: 'ku' },
+  { code: 'ps.abdulwali',  label: '🇦🇫 پښتو (Pashto)',        ui: 'ps' },
+  { code: 'tg.argun',      label: '🇹🇯 Тоҷикӣ',               ui: 'tg' },
+  { code: 'kk.khalifev',   label: '🇰🇿 Қазақша',              ui: 'kk' },
+  { code: 'uz.sadiq',      label: '🇺🇿 Oʻzbekcha',            ui: 'uz' },
+  { code: 'az.musayev',    label: '🇦🇿 Azərbaycanca',         ui: 'az' },
+  { code: 'sq.ahmeti',     label: '🇦🇱 Shqip',                ui: 'sq' },
+  { code: 'bs.korkut',     label: '🇧🇦 Bosanski',             ui: 'bs' },
+  { code: 'mk.makedon',    label: '🇲🇰 Македонски',           ui: 'mk' },
+  { code: 'sr.jasarovic',  label: '🇷🇸 Српски',               ui: 'sr' },
+  { code: 'bg.theodorov',  label: '🇧🇬 Български',            ui: 'bg' },
+  { code: 'ro.grigore',    label: '🇷🇴 Română',               ui: 'ro' },
+  { code: 'cs.hrbek',      label: '🇨🇿 Čeština',              ui: 'cs' },
+  { code: 'sk.hrozny',     label: '🇸🇰 Slovenčina',           ui: 'sk' },
+  { code: 'hr.veledzar',   label: '🇭🇷 Hrvatski',             ui: 'hr' },
+  { code: 'hu.sarvar',     label: '🇭🇺 Magyar',               ui: 'hu' },
+  { code: 'el.pentazos',   label: '🇬🇷 Ελληνικά',             ui: 'el' },
+  { code: 'vi.thequang',   label: '🇻🇳 Tiếng Việt',           ui: 'vi' },
+  { code: 'ms.abdullah',   label: '🇲🇾 Bahasa Melayu',        ui: 'ms' },
+  { code: 'tl.agayani',    label: '🇵🇭 Filipino',             ui: 'tl' },
+  { code: 'ko.korean',     label: '🇰🇷 한국어 (Korean)',      ui: 'ko' },
+  { code: 'fa.fooladvand', label: '🇮🇷 فارسی (Farsi)',        ui: 'fa' },
+  { code: 'en.asad',       label: '🇺🇸 English (Asad)',       ui: 'en' },
+  { code: 'en.pickthall',  label: '🇺🇸 English (Pickthall)',  ui: 'en' },
+];
+
+// ─── UI Translations ───
+const UI_TR = {
+  en: {
+    headerTitle: 'Quran Majeed',
+    sidebarTitle: '📖 Index (114)',
+    searchPlaceholder: '🔍 Search surah...',
+    welcomeTitle: 'Quran Majeed',
+    welcomeDesc: 'Click ☰ to choose a surah. Pinch to zoom. Translation shown below each verse.',
+    f1: '114 Surahs', f2: '45+ Languages', f3: 'Dark Mode', f4: 'Search',
+    loading: 'Loading...', errorTitle: '❌ Loading Error',
+    errorConn: 'Connection issue. Please try again.',
+    retry: '🔄 Retry', index: '📖 Index',
+    prev: '← Previous', next: 'Next →', verses: 'verses',
+    themeLight: '☀️', themeDark: '🌙',
+    searching: '🔍 Searching...',
+    noResults: '😔 No results found',
+    searchError: '❌ Search failed. Try again.',
+    results: 'results',
+  },
+  fr: {
+    headerTitle: 'Coran Majeed',
+    sidebarTitle: '📖 Index (114)',
+    searchPlaceholder: '🔍 Rechercher sourate...',
+    welcomeTitle: 'Coran Majeed',
+    welcomeDesc: 'Cliquez sur ☰ pour choisir une sourate. Pincez pour zoomer. Traduction sous chaque verset.',
+    f1: '114 Sourates', f2: '45+ Langues', f3: 'Mode Nuit', f4: 'Recherche',
+    loading: 'Chargement...', errorTitle: '❌ Erreur de chargement',
+    errorConn: 'Problème de connexion. Réessayez.',
+    retry: '🔄 Réessayer', index: '📖 Index',
+    prev: '← Précédente', next: 'Suivante →', verses: 'versets',
+    themeLight: '☀️', themeDark: '🌙',
+  },
+  es: {
+    headerTitle: 'Corán Majeed',
+    sidebarTitle: '📖 Índice (114)',
+    searchPlaceholder: '🔍 Buscar sura...',
+    welcomeTitle: 'Corán Majeed',
+    welcomeDesc: 'Haz clic en ☰ para elegir una sura. Pellizca para zoom. Traducción debajo de cada versículo.',
+    f1: '114 Suras', f2: '45+ Idiomas', f3: 'Modo Oscuro', f4: 'Buscar',
+    loading: 'Cargando...', errorTitle: '❌ Error de carga',
+    errorConn: 'Problema de conexión. Intente de nuevo.',
+    retry: '🔄 Reintentar', index: '📖 Índice',
+    prev: '← Anterior', next: 'Siguiente →', verses: 'versículos',
+    themeLight: '☀️', themeDark: '🌙',
+    searching: '🔍 Buscando...',
+    noResults: '😔 Sin resultados',
+    searchError: '❌ Error al buscar. Intente de nuevo.',
+    results: 'resultados',
+  },
+  ar: {
+    headerTitle: 'القرآن الكريم',
+    sidebarTitle: '📖 الفهرس (114)',
+    searchPlaceholder: '🔍 بحث عن سورة...',
+    welcomeTitle: 'القرآن الكريم',
+    welcomeDesc: 'اضغط ☰ لاختيار سورة. استخدم إصبعين للتكبير. الترجمة أسفل كل آية.',
+    f1: '114 سورة', f2: '45+ لغة', f3: 'الوضع الليلي', f4: 'بحث',
+    loading: 'جارٍ التحميل...', errorTitle: '❌ خطأ في التحميل',
+    errorConn: 'مشكلة في الاتصال. حاول مرة أخرى.',
+    retry: '🔄 إعادة المحاولة', index: '📖 الفهرس',
+    prev: '← السابقة', next: 'التالية →', verses: 'آية',
+    themeLight: '☀️', themeDark: '🌙',
+    searching: '🔍 جارٍ البحث...',
+    noResults: '😔 لا توجد نتائج',
+    searchError: '❌ فشل البحث. حاول مرة أخرى.',
+    results: 'نتيجة',
+  },
+  ur: {
+    headerTitle: 'قرآن مجید',
+    sidebarTitle: '📖 فہرست (114)',
+    searchPlaceholder: '🔍 سورت تلاش کریں...',
+    welcomeTitle: 'قرآن مجید',
+    welcomeDesc: '☰ پر کلک کریں سورت منتخب کرنے کے لیے۔ زوم کے لیے چٹکی کا استعمال کریں۔',
+    f1: '114 سورتیں', f2: '45+ زبانیں', f3: 'ڈارک موڈ', f4: 'تلاش',
+    loading: 'لوڈ ہو رہا ہے...', errorTitle: '❌ لوڈنگ میں خرابی',
+    errorConn: 'کنکشن کا مسئلہ۔ دوبارہ کوشش کریں۔',
+    retry: '🔄 دوبارہ کوشش', index: '📖 فہرست',
+    prev: '← پچھلی', next: 'اگلی →', verses: 'آیات',
+    themeLight: '☀️', themeDark: '🌙',
+  },
+  id: {
+    headerTitle: 'Al-Quran',
+    sidebarTitle: '📖 Daftar (114)',
+    searchPlaceholder: '🔍 Cari surah...',
+    welcomeTitle: 'Al-Quran',
+    welcomeDesc: 'Klik ☰ untuk pilih surah. Jepit untuk zoom. Terjemahan di bawah setiap ayat.',
+    f1: '114 Surah', f2: '45+ Bahasa', f3: 'Mode Gelap', f4: 'Cari',
+    loading: 'Memuat...', errorTitle: '❌ Gagal memuat',
+    errorConn: 'Masalah koneksi. Coba lagi.',
+    retry: '🔄 Ulangi', index: '📖 Daftar',
+    prev: '← Sebelumnya', next: 'Selanjutnya →', verses: 'ayat',
+    themeLight: '☀️', themeDark: '🌙',
+  },
+  tr: {
+    headerTitle: 'Kuran-ı Kerim',
+    sidebarTitle: '📖 Fihrist (114)',
+    searchPlaceholder: '🔍 Sure ara...',
+    welcomeTitle: 'Kuran-ı Kerim',
+    welcomeDesc: 'Sure seçmek için ☰ tıklayın. Yakınlaştırmak için iki parmağınızı kullanın.',
+    f1: '114 Sure', f2: '45+ Dil', f3: 'Karanlık Mod', f4: 'Ara',
+    loading: 'Yükleniyor...', errorTitle: '❌ Yükleme Hatası',
+    errorConn: 'Bağlantı sorunu. Tekrar deneyin.',
+    retry: '🔄 Tekrar Dene', index: '📖 Fihrist',
+    prev: '← Önceki', next: 'Sonraki →', verses: 'ayet',
+    themeLight: '☀️', themeDark: '🌙',
+  },
+  de: {
+    headerTitle: 'Quran Majeed',
+    sidebarTitle: '📖 Verzeichnis (114)',
+    searchPlaceholder: '🔍 Sure suchen...',
+    welcomeTitle: 'Quran Majeed',
+    welcomeDesc: 'Klicke ☰ um eine Sure zu wählen. Zum Zoomen zwei Finger verwenden.',
+    f1: '114 Suren', f2: '45+ Sprachen', f3: 'Nachtmodus', f4: 'Suche',
+    loading: 'Lädt...', errorTitle: '❌ Ladefehler',
+    errorConn: 'Verbindungsproblem. Bitte erneut versuchen.',
+    retry: '🔄 Wiederholen', index: '📖 Verzeichnis',
+    prev: '← Vorherige', next: 'Nächste →', verses: 'Verse',
+    themeLight: '☀️', themeDark: '🌙',
+  },
+  ru: {
+    headerTitle: 'Коран',
+    sidebarTitle: '📖 Список (114)',
+    searchPlaceholder: '🔍 Поиск суры...',
+    welcomeTitle: 'Коран',
+    welcomeDesc: 'Нажмите ☰ чтобы выбрать суру. Зажмите для масштаба.',
+    f1: '114 Сур', f2: '45+ Языков', f3: 'Тёмная тема', f4: 'Поиск',
+    loading: 'Загрузка...', errorTitle: '❌ Ошибка загрузки',
+    errorConn: 'Проблема с соединением.',  retry: '🔄 Повторить', index: '📖 Список',
+    prev: '← Предыдущая', next: 'Следующая →', verses: 'аятов',
+    themeLight: '☀️', themeDark: '🌙',
+  },
+  pt: {
+    headerTitle: 'Alcorão',
+    sidebarTitle: '📖 Índice (114)',
+    searchPlaceholder: '🔍 Buscar surata...',
+    welcomeTitle: 'Alcorão Sagrado',
+    welcomeDesc: 'Clique ☰ para escolher uma surata. Pinça para zoom.',
+    f1: '114 Suratas', f2: '45+ Idiomas', f3: 'Modo Escuro', f4: 'Buscar',
+    loading: 'Carregando...', errorTitle: '❌ Erro ao carregar',
+    errorConn: 'Problema de conexão.', retry: '🔄 Tentar novamente', index: '📖 Índice',
+    prev: '← Anterior', next: 'Próxima →', verses: 'versículos',
+    themeLight: '☀️', themeDark: '🌙',
+  },
+  zh: {
+    headerTitle: '古兰经',
+    sidebarTitle: '📖 目录 (114)',
+    searchPlaceholder: '🔍 搜索章节...',
+    welcomeTitle: '古兰经',
+    welcomeDesc: '点击☰选择章节。双指缩放。',
+    f1: '114章', f2: '45+种语言', f3: '夜间模式', f4: '搜索',
+    loading: '加载中...', errorTitle: '❌ 加载错误',
+    errorConn: '连接问题，请重试。',retry: '🔄 重试', index: '📖 目录',
+    prev: '← 上一章', next: '下一章 →', verses: '节',
+    themeLight: '☀️', themeDark: '🌙',
+  },
+  hi: {
+    headerTitle: 'क़ुरान मजीद',
+    sidebarTitle: '📖 सूची (114)',
+    searchPlaceholder: '🔍 सूरा खोजें...',
+    welcomeTitle: 'क़ुरान मजीद',
+    welcomeDesc: 'सूरा चुनने के लिए ☰ दबाएँ। ज़ूम के लिए चुटकी का प्रयोग करें।',
+    f1: '114 सूरह', f2: '45+ भाषाएँ', f3: 'डार्क मोड', f4: 'खोज',
+    loading: 'लोड हो रहा है...', errorTitle: '❌ लोडिंग त्रुटि',
+    errorConn: 'कनेक्शन समस्या। पुनः प्रयास करें।', retry: '🔄 पुनः प्रयास', index: '📖 सूची',
+    prev: '← पिछला', next: 'अगला →', verses: 'आयतें',
+    themeLight: '☀️', themeDark: '🌙',
+  },
+};
+
+// Default to English UI if user's language isn't covered
+function getUICode(langCode) {
+  const lang = LANGUAGES.find(l => l.code === langCode);
+  if (!lang) return 'en';
+  const map = {
+    'en': 'en','fr': 'fr','es': 'es','ar': 'ar','ur': 'ur','id': 'id',
+    'tr': 'tr','de': 'de','ru': 'ru','pt': 'pt','zh': 'zh','hi': 'hi',
+    'it': 'it','nl': 'nl','pl': 'pl','sv': 'sv','bn': 'bn','ja': 'ja',
+    'ta': 'ta','ml': 'ml','th': 'th','sw': 'sw','so': 'so','ha': 'ha',
+    'am': 'am','ku': 'ku','ps': 'ps','tg': 'tg','kk': 'kk','uz': 'uz',
+    'az': 'az','sq': 'sq','bs': 'bs','mk': 'mk','sr': 'sr','bg': 'bg',
+    'ro': 'ro','cs': 'cs','sk': 'sk','hr': 'hr','hu': 'hu','el': 'el',
+    'vi': 'vi','ms': 'ms','tl': 'tl','ko': 'ko','fa': 'fa',
+  };
+  return map[lang.ui] || 'en';
+}
+
+// ═══════════════════════════════════════════════
+//  STATE
+// ═══════════════════════════════════════════════
+
+const SURAHS = [
+  {n:1,a:"الفاتحة",e:"Al-Fatihah"},{n:2,a:"البقرة",e:"Al-Baqarah"},{n:3,a:"آل عمران",e:"Ali Imran"},{n:4,a:"النساء",e:"An-Nisa"},{n:5,a:"المائدة",e:"Al-Ma'idah"},{n:6,a:"الأنعام",e:"Al-An'am"},{n:7,a:"الأعراف",e:"Al-A'raf"},{n:8,a:"الأنفال",e:"Al-Anfal"},{n:9,a:"التوبة",e:"At-Tawbah"},{n:10,a:"يونس",e:"Yunus"},{n:11,a:"هود",e:"Hud"},{n:12,a:"يوسف",e:"Yusuf"},{n:13,a:"الرعد",e:"Ar-Ra'd"},{n:14,a:"إبراهيم",e:"Ibrahim"},{n:15,a:"الحجر",e:"Al-Hijr"},{n:16,a:"النحل",e:"An-Nahl"},{n:17,a:"الإسراء",e:"Al-Isra"},{n:18,a:"الكهف",e:"Al-Kahf"},{n:19,a:"مريم",e:"Maryam"},{n:20,a:"طه",e:"Taha"},{n:21,a:"الأنبياء",e:"Al-Anbya"},{n:22,a:"الحج",e:"Al-Hajj"},{n:23,a:"المؤمنون",e:"Al-Mu'minun"},{n:24,a:"النور",e:"An-Nur"},{n:25,a:"الفرقان",e:"Al-Furqan"},{n:26,a:"الشعراء",e:"Ash-Shu'ara"},{n:27,a:"النمل",e:"An-Naml"},{n:28,a:"القصص",e:"Al-Qasas"},{n:29,a:"العنكبوت",e:"Al-'Ankabut"},{n:30,a:"الروم",e:"Ar-Rum"},{n:31,a:"لقمان",e:"Luqman"},{n:32,a:"السجدة",e:"As-Sajdah"},{n:33,a:"الأحزاب",e:"Al-Ahzab"},{n:34,a:"سبأ",e:"Saba"},{n:35,a:"فاطر",e:"Fatir"},{n:36,a:"يس",e:"Ya-Sin"},{n:37,a:"الصافات",e:"As-Saffat"},{n:38,a:"ص",e:"Sad"},{n:39,a:"الزمر",e:"Az-Zumar"},{n:40,a:"غافر",e:"Ghafir"},{n:41,a:"فصلت",e:"Fussilat"},{n:42,a:"الشورى",e:"Ash-Shuraa"},{n:43,a:"الزخرف",e:"Az-Zukhruf"},{n:44,a:"الدخان",e:"Ad-Dukhan"},{n:45,a:"الجاثية",e:"Al-Jathiyah"},{n:46,a:"الأحقاف",e:"Al-Ahqaf"},{n:47,a:"محمد",e:"Muhammad"},{n:48,a:"الفتح",e:"Al-Fath"},{n:49,a:"الحجرات",e:"Al-Hujurat"},{n:50,a:"ق",e:"Qaf"},{n:51,a:"الذاريات",e:"Adh-Dhariyat"},{n:52,a:"الطور",e:"At-Tur"},{n:53,a:"النجم",e:"An-Najm"},{n:54,a:"القمر",e:"Al-Qamar"},{n:55,a:"الرحمن",e:"Ar-Rahman"},{n:56,a:"الواقعة",e:"Al-Waqi'ah"},{n:57,a:"الحديد",e:"Al-Hadid"},{n:58,a:"المجادلة",e:"Al-Mujadila"},{n:59,a:"الحشر",e:"Al-Hashr"},{n:60,a:"الممتحنة",e:"Al-Mumtahanah"},{n:61,a:"الصف",e:"As-Saff"},{n:62,a:"الجمعة",e:"Al-Jumu'ah"},{n:63,a:"المنافقون",e:"Al-Munafiqun"},{n:64,a:"التغابن",e:"At-Taghabun"},{n:65,a:"الطلاق",e:"At-Talaq"},{n:66,a:"التحريم",e:"At-Tahrim"},{n:67,a:"الملك",e:"Al-Mulk"},{n:68,a:"القلم",e:"Al-Qalam"},{n:69,a:"الحاقة",e:"Al-Haqqah"},{n:70,a:"المعارج",e:"Al-Ma'arij"},{n:71,a:"نوح",e:"Nuh"},{n:72,a:"الجن",e:"Al-Jinn"},{n:73,a:"المزمل",e:"Al-Muzzammil"},{n:74,a:"المدثر",e:"Al-Muddaththir"},{n:75,a:"القيامة",e:"Al-Qiyamah"},{n:76,a:"الإنسان",e:"Al-Insan"},{n:77,a:"المرسلات",e:"Al-Mursalat"},{n:78,a:"النبأ",e:"An-Naba"},{n:79,a:"النازعات",e:"An-Nazi'at"},{n:80,a:"عبس",e:"'Abasa"},{n:81,a:"التكوير",e:"At-Takwir"},{n:82,a:"الإنفطار",e:"Al-Infitar"},{n:83,a:"المطففين",e:"Al-Mutaffifin"},{n:84,a:"الإنشقاق",e:"Al-Inshiqaq"},{n:85,a:"البروج",e:"Al-Buruj"},{n:86,a:"الطارق",e:"At-Tariq"},{n:87,a:"الأعلى",e:"Al-A'la"},{n:88,a:"الغاشية",e:"Al-Ghashiyah"},{n:89,a:"الفجر",e:"Al-Fajr"},{n:90,a:"البلد",e:"Al-Balad"},{n:91,a:"الشمس",e:"Ash-Shams"},{n:92,a:"الليل",e:"Al-Layl"},{n:93,a:"الضحى",e:"Ad-Duhaa"},{n:94,a:"الشرح",e:"Ash-Sharh"},{n:95,a:"التين",e:"At-Tin"},{n:96,a:"العلق",e:"Al-'Alaq"},{n:97,a:"القدر",e:"Al-Qadr"},{n:98,a:"البينة",e:"Al-Bayyinah"},{n:99,a:"الزلزلة",e:"Az-Zalzalah"},{n:100,a:"العاديات",e:"Al-'Adiyat"},{n:101,a:"القارعة",e:"Al-Qari'ah"},{n:102,a:"التكاثر",e:"At-Takathur"},{n:103,a:"العصر",e:"Al-'Asr"},{n:104,a:"الهمزة",e:"Al-Humazah"},{n:105,a:"الفيل",e:"Al-Fil"},{n:106,a:"قريش",e:"Quraysh"},{n:107,a:"الماعون",e:"Al-Ma'un"},{n:108,a:"الكوثر",e:"Al-Kawthar"},{n:109,a:"الكافرون",e:"Al-Kafirun"},{n:110,a:"النصر",e:"An-Nasr"},{n:111,a:"المسد",e:"Al-Masad"},{n:112,a:"الإخلاص",e:"Al-Ikhlas"},{n:113,a:"الفلق",e:"Al-Falaq"},{n:114,a:"الناس",e:"An-Nas"}
+];
+
+let currentSurah = 0;
+let fontSize = 1.8;
+let transSize = 0.95;
+let currentLang = localStorage.getItem('quranLang') || 'en.sahih';
+let touchStartDist = 0;
+let quranData = null;
+
+
+// ═══════════════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════════════
+
+function init() {
+  populateLangSelect();
+  loadIndex();
+  applyUI();
+  // Restore theme
+  if (localStorage.getItem('quranTheme') === 'dark') {
+    document.body.classList.add('dark');
+    document.getElementById('themeBtn').textContent = '☀️';
+  }
+  // Offline detection
+  const banner = document.getElementById('offlineBanner');
+  function updateOffline() {
+    banner.classList.toggle('show', !navigator.onLine);
+  }
+  window.addEventListener('online', updateOffline);
+  window.addEventListener('offline', updateOffline);
+  updateOffline();
+}
+
+function populateLangSelect() {
+  const sel = document.getElementById('langSelect');
+  sel.innerHTML = '';
+  LANGUAGES.forEach(l => {
+    const opt = document.createElement('option');
+    opt.value = l.code;
+    opt.textContent = l.label;
+    if (l.code === currentLang) opt.selected = true;
+    sel.appendChild(opt);
+  });
+}
+
+// ═══════════════════════════════════════════════
+//  UI LANGUAGE
+// ═══════════════════════════════════════════════
+
+function applyUI() {
+  const code = getUICode(currentLang);
+  // For RTL languages
+  if (code === 'ar' || code === 'ur' || code === 'fa' || code === 'ps' || code === 'ku') {
+    document.dir = 'rtl';
+    document.documentElement.lang = code;
+  } else {
+    document.dir = 'ltr';
+    document.documentElement.lang = code;
+  }
+  const t = UI_TR[code] || UI_TR.en;
+  setText('headerTitle', t.headerTitle);
+  setText('sidebarTitle', t.sidebarTitle);
+  document.getElementById('surahSearch').placeholder = t.searchPlaceholder;
+  setText('welcomeTitle', t.welcomeTitle);
+  setText('welcomeDesc', t.welcomeDesc);
+  setText('f1', t.f1);
+  setText('f2', t.f2);
+  setText('f3', t.f3);
+  setText('f4', t.f4);
+}
+
+function setText(id, txt) {
+  const el = document.getElementById(id);
+  if (el) el.textContent = txt;
+}
+
+function getUI(key) {
+  const code = getUICode(currentLang);
+  return (UI_TR[code] || UI_TR.en)[key] || UI_TR.en[key];
+}
+
+function changeLanguage(code) {
+  currentLang = code;
+  localStorage.setItem('quranLang', code);
+  applyUI();
+  if (currentSurah > 0) {
+    loadSurah(currentSurah);
+  }
+}
+
+// ═══════════════════════════════════════════════
+//  SIDEBAR
+// ═══════════════════════════════════════════════
+
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('sidebarOverlay').classList.toggle('show');
+}
+
+function openSearch() {
+  const sidebar = document.getElementById('sidebar');
+  const overlay = document.getElementById('sidebarOverlay');
+  sidebar.classList.add('open');
+  overlay.classList.add('show');
+  setTimeout(() => document.getElementById('surahSearch').focus(), 300);
+}
+
+// ═══════════════════════════════════════════════
+//  GLOBAL SEARCH - CORREGIDO PARA ÁRABE
+// ═══════════════════════════════════════════════
+
+let searchTimeout;
+let lastSearchQuery = '';
+let translationCache = {};
+
+function normalizeArabic(text, fuzzy) {
+  let s = text
+    .replace(/[\u064B-\u065F\u0653]/g, '')
+    .replace(/\u0640/g, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+  if (fuzzy) {
+    s = s
+      .replace(/[\u064A\u0649]/g, '\u064A')
+      .replace(/[\u0624\u0626\u0621]/g, '')
+      .replace(/[\u0622\u0623\u0625\u0671\u0670]/g, '\u0627')
+      .replace(/\u0629/g, '\u0647');
+  }
+  return s;
+}
+
+function hasArabic(text) {
+  return /[\u0600-\u06FF]/.test(text);
+}
+
+function getSearchLang() {
+  const code = getUICode(currentLang);
+  const arLangs = ['ar', 'ur', 'fa', 'ps', 'ku'];
+  return arLangs.includes(code) ? 'ar' : code;
+}
+
+function preloadQuranData() {
+  setTimeout(() => {
+    if (!quranData) loadQuranData().catch(() => {});
+  }, 2000);
+}
+
+function loadQuranData() {
+  if (quranData) return Promise.resolve(quranData);
+
+  // Check localStorage cache first
+  const cached = localStorage.getItem('quranSearchData');
+  if (cached) {
+    try {
+      quranData = JSON.parse(cached);
+      return Promise.resolve(quranData);
+    } catch(e) {}
+  }
+
+  // Fetch from API with timeout
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 30000);
+  return fetch('https://api.alquran.cloud/v1/quran/quran-arshad', { signal: controller.signal })
+    .then(r => { clearTimeout(timeoutId); return r.json(); })
+    .then(d => {
+      quranData = d.data.surahs;
+      try { localStorage.setItem('quranSearchData', JSON.stringify(quranData)); } catch(e) {}
+      return quranData;
+    })
+    .catch(() => {
+      clearTimeout(timeoutId);
+      return null;
+    });
+}
+
+
+function openGlobalSearch() {
+  const modal = document.getElementById('searchModal');
+  const input = document.getElementById('globalSearchInput');
+  modal.classList.add('open');
+  setTimeout(() => {
+    input.focus();
+    input.value = '';
+    document.getElementById('searchResults').innerHTML = '';
+    lastSearchQuery = '';
+  }, 100);
+}
+
+function closeGlobalSearch() {
+  document.getElementById('searchModal').classList.remove('open');
+}
+
+function performGlobalSearch(query) {
+  clearTimeout(searchTimeout);
+
+  const normalizedQuery = normalizeArabic(query);
+
+  if (!normalizedQuery || normalizedQuery.length < 2) {
+    document.getElementById('searchResults').innerHTML = '';
+    return;
+  }
+
+  if (normalizedQuery === lastSearchQuery) return;
+  lastSearchQuery = normalizedQuery;
+
+  searchTimeout = setTimeout(async () => {
+    const resultsDiv = document.getElementById('searchResults');
+    resultsDiv.innerHTML = `<div class="search-loading">${getUI('searching')}</div>`;
+
+    try {
+      if (hasArabic(normalizedQuery)) {
+        resultsDiv.innerHTML = `<div class="search-loading"><div class="spinner"></div><p>${getUI('searching')}</p></div>`;
+        const surahs = await loadQuranData();
+        if (!surahs) {
+          resultsDiv.innerHTML = `
+            <div class="search-no-results">
+              <p>${getUI('searchError')}</p>
+              <button class="retry-btn" onclick="performGlobalSearch(document.getElementById('globalSearchInput').value)">
+                🔄 ${getUI('retry')}
+              </button>
+            </div>`;
+          return;
+        }
+
+        const exactQuery = normalizeArabic(query, false);
+        const fuzzyQuery = normalizeArabic(query, true);
+        const exactRegex = new RegExp(exactQuery.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i');
+        const fuzzyRegex = new RegExp(fuzzyQuery.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i');
+        let exactMatches = [];
+        let fuzzyMatches = [];
+        const seenExact = new Set();
+
+        for (const surah of surahs) {
+          for (const ayah of surah.ayahs) {
+            const exactText = normalizeArabic(ayah.text, false);
+            const exact = exactRegex.test(exactText);
+            const fuzzy = !exact && fuzzyRegex.test(normalizeArabic(ayah.text, true));
+            if (exact || fuzzy) {
+              const cached = translationCache[`surah-${surah.number}`] || [];
+              const t = cached.find(c => c.ayah === ayah.numberInSurah);
+              const entry = { surah, ayah, translation: t ? t.translation : '', exact };
+              if (exact) {
+                exactMatches.push(entry);
+                seenExact.add(`${surah.number}-${ayah.numberInSurah}`);
+              } else {
+                fuzzyMatches.push(entry);
+              }
+            }
+          }
+        }
+
+        let matches = [...exactMatches, ...fuzzyMatches];
+
+        if (matches.length === 0) {
+          resultsDiv.innerHTML = `<div class="search-no-results">${getUI('noResults')}</div>`;
+          return;
+        }
+
+        const exactCount = exactMatches.length;
+        const total = matches.length;
+        matches = matches.slice(0, 40);
+        let html = `<div class="search-count">${total} ${getUI('results')}${exactCount > 0 ? ` (${exactCount} exactas)` : ''}</div>`;
+        matches.forEach(m => {
+          html += `<div class="search-result-item" onclick="goToAyah(${m.surah.number}, ${m.ayah.numberInSurah})">
+            <div class="result-surah">${m.surah.name} • ${m.surah.englishName}</div>
+            <div class="result-arabic">${m.ayah.text}</div>`;
+          if (m.translation) {
+            html += `<div class="result-translation">${m.translation}</div>`;
+          }
+          html += `<span class="result-ayah-num">Ayah ${m.ayah.numberInSurah}</span>
+          </div>`;
+        });
+        resultsDiv.innerHTML = html;
+        return;
+      }
+
+      const searchLang = getSearchLang();
+      const encodedQuery = encodeURIComponent(normalizedQuery);
+      const url = `https://api.alquran.cloud/v1/search/${encodedQuery}/all/${searchLang}`;
+
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 20000);
+      const response = await fetch(url, { headers: { 'Accept-Encoding': 'gzip' }, signal: controller.signal });
+      clearTimeout(timeoutId);
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+      const data = await response.json();
+
+      if (!data.data || !data.data.matches || data.data.matches.length === 0) {
+        resultsDiv.innerHTML = `<div class="search-no-results">${getUI('noResults')}</div>`;
+        return;
+      }
+
+      let matches = data.data.matches.slice(0, 30);
+      const total = data.data.matches.length;
+      let html = `<div class="search-count">${total} ${getUI('results')}</div>`;
+
+      matches.forEach(match => {
+        const surahName = match.surah.englishName;
+        const surahNameAr = match.surah.name;
+        const ayahNum = match.numberInSurah;
+        const isTranslation = !match.edition.identifier.startsWith('quran-');
+
+        html += `<div class="search-result-item" onclick="goToAyah(${match.surah.number}, ${ayahNum})">
+          <div class="result-surah">${surahNameAr} • ${surahName} <span class="search-badge">${match.edition.identifier}</span></div>`;
+        if (isTranslation) {
+          html += `<div class="result-translation" style="font-size:0.95rem;border:none;margin:0;padding:0;color:var(--text)">${match.text}</div>`;
+        } else {
+          html += `<div class="result-arabic">${match.text}</div>`;
+        }
+        html += `<span class="result-ayah-num">Ayah ${ayahNum}</span>
+        </div>`;
+      });
+
+      resultsDiv.innerHTML = html;
+
+    } catch (err) {
+      resultsDiv.innerHTML = `<div class="search-no-results">${getUI('searchError')}</div>`;
+    }
+  }, 600);
+}
+
+function goToAyah(surahNum, ayahNum) {
+  closeGlobalSearch();
+  loadSurah(surahNum);
+
+  setTimeout(() => {
+    const ayahBlock = document.getElementById(`ayah-${ayahNum}`);
+    if (ayahBlock) {
+      ayahBlock.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      ayahBlock.style.background = 'rgba(200, 154, 0, 0.2)';
+      setTimeout(() => {
+        ayahBlock.style.background = '';
+      }, 3000);
+    }
+  }, 800);
+}
+
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') closeGlobalSearch();
+});
+document.getElementById('searchModal').addEventListener('click', (e) => {
+  if (e.target.id === 'searchModal') closeGlobalSearch();
+});
+
+function filterSurahs(query) {
+  const items = document.querySelectorAll('.surah-item');
+  const q = query.toLowerCase();
+  items.forEach(item => {
+    const txt = item.textContent.toLowerCase();
+    item.style.display = txt.includes(q) ? '' : 'none';
+  });
+}
+
+function loadIndex() {
+  const list = document.getElementById('surahList');
+  list.innerHTML = '';
+  SURAHS.forEach(s => {
+    const li = document.createElement('li');
+    li.className = 'surah-item';
+    li.dataset.num = s.n;
+    li.innerHTML = `<span><span class="surah-name-ar">${s.n}. ${s.a}</span></span> <span class="surah-name-en">${s.e}</span>`;
+    li.onclick = () => { loadSurah(s.n); toggleSidebar(); };
+    list.appendChild(li);
+  });
+}
+
+// ═══════════════════════════════════════════════
+//  LOAD SURAH
+// ═══════════════════════════════════════════════
+
+async function loadSurah(num, highlightAyah) {
+  currentSurah = num;
+  const surah = SURAHS.find(s => s.n === num);
+  const name = surah ? surah.a : `Surah ${num}`;
+  document.getElementById('headerTitle').textContent = name;
+
+  const container = document.getElementById('mainContent');
+  container.innerHTML = `<div class="loader"><div class="spinner"></div><p>${getUI('loading')}</p></div>`;
+
+  // Fetch Arabic + translation in parallel
+  const edition = currentLang === 'ar' ? 'quran-arshad' : currentLang;
+  const arabicEdition = 'quran-arshad';
+
+  try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 20000);
+
+    let url;
+    if (currentLang === 'ar') {
+      url = `https://api.alquran.cloud/v1/surah/${num}`;
+    } else {
+      url = `https://api.alquran.cloud/v1/surah/${num}/editions/${arabicEdition},${edition}`;
+    }
+
+    const response = await fetch(url, { signal: controller.signal });
+    clearTimeout(timeoutId);
+
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    const data = await response.json();
+
+    let ayahs;
+    let englishName = '';
+    let ayahCount = 0;
+
+    if (currentLang === 'ar') {
+      if (!data.data || !data.data.ayahs) throw new Error('Invalid data');
+      ayahs = data.data.ayahs.map(a => ({ arabic: a.text, translation: '', num: a.numberInSurah }));
+      englishName = data.data.englishName;
+      ayahCount = data.data.numberOfAyahs;
+    } else {
+      if (!data.data || !Array.isArray(data.data) || data.data.length < 2) throw new Error('Invalid data');
+      const arabicData = data.data[0];
+      const transData = data.data[1];
+      ayahs = arabicData.ayahs.map((a, i) => ({
+        arabic: a.text,
+        translation: transData.ayahs[i] ? transData.ayahs[i].text : '',
+        num: a.numberInSurah
+      }));
+      englishName = arabicData.englishName;
+      ayahCount = arabicData.numberOfAyahs;
+    }
+
+    let html = `<div class="surah-container">
+      <div class="surah-header">
+        <h2>${name}</h2>
+          <div class="sub">${englishName} • ${ayahCount} ${getUI('verses')}</div>
+          <div style="margin-top:12px;font-size:0.8rem;color:var(--text-secondary);font-family:'Inter',sans-serif;opacity:0.6">by yz · azer.tyu199p@gmail.com</div>
+      </div>`;
 
     ayahs.forEach(ayah => {
       html += `<div class="ayah-block" id="ayah-${ayah.num}">
@@ -583,7 +1312,5 @@ function toggleTheme() {
 init();
 preloadQuranData();
 </script>
-<div style="text-align:center;padding:18px;font-family:'Inter',sans-serif;font-size:0.8rem;color:var(--text-secondary)">by yz · azer.tyu199p@gmail.com</div>
 </body>
 </html>
-
