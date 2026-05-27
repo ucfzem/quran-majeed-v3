@@ -21,14 +21,7 @@
   <meta name="twitter:description" content="Read the Holy Quran with Arabic text and translations in 45+ languages.">
   <link rel="canonical" href="https://ucfzem.github.io/quran-majeed-v3/">
   <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
-  <!-- Google Analytics -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-    gtag('config', 'G-XXXXXXXXXX');
-  </script>
+  <!-- Analytics disabled for now -->
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
@@ -339,6 +332,63 @@
       font-family: 'Inter', sans-serif; margin-left: 8px;
     }
 
+    /* ─── WORD BY WORD ─── */
+    .wby-toggle {
+      background: var(--primary); color: white; border: none;
+      border-radius: 20px; padding: 6px 16px; font-size: 0.8rem;
+      cursor: pointer; font-family: 'Inter', sans-serif;
+      transition: all 0.2s; white-space: nowrap;
+    }
+    .wby-toggle.active { background: var(--gold); color: #5c4000; }
+    .wby-toggle:hover { filter: brightness(1.1); }
+
+    .ayah-wby {
+      display: flex; flex-wrap: wrap; gap: 6px 14px;
+      justify-content: center; padding: 8px 0;
+    }
+    .wby-word {
+      display: inline-flex; flex-direction: column;
+      align-items: center; text-align: center;
+      border-radius: 8px; padding: 2px 4px;
+      transition: background 0.2s; cursor: default;
+    }
+    .wby-word:hover { background: rgba(0,105,92,0.06); }
+    .wby-word .ar {
+      font-size: calc(var(--ayah-size) * 0.85);
+      font-family: 'Amiri', serif; line-height: 2;
+    }
+    .wby-word .mean {
+      font-size: 0.6rem; color: var(--text-secondary);
+      font-family: 'Inter', sans-serif; line-height: 1.3;
+      max-width: 100px; word-break: break-word;
+    }
+    .wby-word .translit {
+      font-size: 0.55rem; color: var(--text-secondary);
+      font-family: 'Inter', sans-serif; opacity: 0.7;
+      font-style: italic; line-height: 1.2;
+    }
+    .wby-ayah-num {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 28px; height: 28px; margin: 4px auto;
+      font-family: Arial, sans-serif; font-weight: bold; font-size: 0.7rem;
+      color: #5c4000;
+      background: radial-gradient(circle at 30% 30%, #fff8e1, var(--gold-light), var(--gold));
+      border: 2px solid #b8860b; border-radius: 50%;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+      align-self: center;
+    }
+    body.dark .wby-ayah-num { background: radial-gradient(circle at 30% 30%, #fff, var(--gold-light), var(--gold)); }
+
+    .wby-header-row {
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 10px; flex-wrap: wrap;
+    }
+    .wby-notice {
+      font-size: 0.7rem; color: var(--text-secondary);
+      font-family: 'Inter', sans-serif; text-align: center;
+      padding: 4px 0; opacity: 0.7;
+    }
+
     /* ─── SCROLLBAR ─── */
     ::-webkit-scrollbar { width: 5px; }
     ::-webkit-scrollbar-track { background: transparent; }
@@ -366,6 +416,7 @@
 
 <!-- HEADER -->
 <header>
+  <button class="wby-toggle" id="wbyToggle" onclick="toggleWordByWord()" title="Mot à mot">📖 Mot à mot</button>
   <button class="btn" id="themeBtn" onclick="toggleTheme()" title="Toggle theme">🌙</button>
   <select id="langSelect" onchange="changeLanguage(this.value)"></select>
   <div class="header-title" id="headerTitle">القرآن الكريم</div>
@@ -411,6 +462,59 @@
     </div>
   </div>
 </div>
+
+<!-- ═══ ULTRALENGUA BANNER ═══ -->
+<style>
+.ultra-promo-bar {
+  position: fixed; bottom: 0; left: 0; right: 0;
+  background: linear-gradient(135deg, #004d40, #00695c);
+  padding: 0.9rem 1.5rem;
+  display: flex; align-items: center;
+  justify-content: space-between; gap: 1rem;
+  flex-wrap: wrap; z-index: 9999;
+  font-family: 'DM Sans', 'Segoe UI', sans-serif;
+  border-top: 2px solid #c9a84c;
+  box-shadow: 0 -4px 30px rgba(0,0,0,0.3);
+}
+.ultra-promo-bar .promo-ar {
+  font-size: 0.82rem; color: rgba(255,255,255,0.55);
+  direction: rtl; margin-bottom: 0.1rem;
+}
+.ultra-promo-bar .promo-title {
+  font-weight: 700; color: #fff; font-size: 0.9rem;
+}
+.ultra-promo-bar .promo-sub {
+  font-size: 0.72rem; color: rgba(255,255,255,0.5);
+}
+.ultra-promo-btn {
+  background: #c9a84c; color: #0a0f0d;
+  border: none; border-radius: 2rem;
+  padding: 0.55rem 1.3rem;
+  font-weight: 700; font-size: 0.82rem;
+  cursor: pointer; text-decoration: none;
+  white-space: nowrap; transition: transform .15s;
+}
+.ultra-promo-btn:hover { transform: scale(1.03); }
+.ultra-promo-close {
+  background: rgba(255,255,255,0.12); border: none;
+  border-radius: 50%; width: 26px; height: 26px;
+  color: rgba(255,255,255,0.6); cursor: pointer;
+  font-size: 0.85rem; flex-shrink: 0;
+}
+</style>
+
+<div class="ultra-promo-bar" id="ultraPromo">
+  <div>
+    <div class="promo-ar">تعلّم عربية القرآن الكريم</div>
+    <div class="promo-title">📚 Apprends l'arabe du Quran</div>
+    <div class="promo-sub">Comprends vraiment ce que tu récites · Ultralengua Pro</div>
+  </div>
+  <a href="https://ucfzem.github.io/ultralengua-pro/?ref=quran_banner"
+     target="_blank" class="ultra-promo-btn">Commencer →</a>
+  <button class="ultra-promo-close"
+          onclick="document.getElementById('ultraPromo').remove()">✕</button>
+</div>
+<!-- ═══ FIN BANNER ═══ -->
 
 <!-- FOOTER -->
 <footer style="text-align:center;padding:20px 16px;font-family:'Inter',sans-serif;font-size:0.82rem;color:var(--text-secondary);border-top:1px solid var(--border);margin-top:20px">
@@ -1219,6 +1323,141 @@ document.addEventListener('touchmove', e => {
     touchStartDist = dist;
   }
 }, { passive: false });
+
+// ═══════════════════════════════════════════════
+//  WORD BY WORD (Mot à mot)
+// ═══════════════════════════════════════════════
+
+let wbwMode = false;
+let wbwCache = {};
+let wbwTransCache = {};
+
+function toggleWordByWord() {
+  wbwMode = !wbwMode;
+  const btn = document.getElementById('wbyToggle');
+  btn.classList.toggle('active', wbwMode);
+  btn.textContent = wbwMode ? '📖 Ayat' : '📖 Mot à mot';
+  if (currentSurah > 0) loadSurah(currentSurah);
+}
+
+const WBW_TRANS_IDS = {
+  'fr.hamidullah': 131, 'en.sahih': 20, 'en.asad': 20,
+  'en.pickthall': 20, 'es.cortes': 147, 'id.indonesian': 33,
+  'tr.ates': 162, 'de.aburida': 173, 'ru.kuliev': 149,
+  'pt.elhayek': 148, 'it.piccardo': 157, 'nl.keyzer': 159,
+  'pl.bielawskiego': 163, 'sv.bernstrom': 124, 'bn.bengali': 29,
+  'zh.jianxin': 56, 'hi.farooq': 158, 'ja.japanese': 37,
+  'ta.tamil': 156, 'ur.jalandhry': 97, 'fa.fooladvand': 138,
+};
+
+const DEFAULT_WBW_TRANS = 20; // English Sahih
+
+function getWbwTransId() {
+  return WBW_TRANS_IDS[currentLang] || DEFAULT_WBW_TRANS;
+}
+
+async function loadSurahWbw(num) {
+  const container = document.getElementById('mainContent');
+  const surah = SURAHS.find(s => s.n === num);
+  const name = surah ? surah.a : `Surah ${num}`;
+
+  try {
+    const [versesRes, transRes] = await Promise.all([
+      fetch(`https://api.quran.com/api/v4/quran/verses/uthmani?chapter_number=${num}`),
+      fetch(`https://api.quran.com/api/v4/quran/translations/${getWbwTransId()}?chapter_number=${num}`)
+    ]);
+
+    if (!versesRes.ok || !transRes.ok) throw new Error('API error');
+
+    const versesData = await versesRes.json();
+    const transData = await transRes.json();
+
+    const verses = versesData.verses || [];
+    const translations = transData.translations || [];
+
+    // Build translation map: verse_key -> words with translation
+    const transMap = {};
+    translations.forEach(t => {
+      transMap[t.verse_key] = t.words || [];
+    });
+
+    const englishName = verses[0]?.verse_key?.split(':')[0]
+      ? SURAHS.find(s => s.n === num)?.e || ''
+      : '';
+
+    let html = `<div class="surah-container">
+      <div class="surah-header">
+        <div class="wby-header-row">
+          <h2>${name}</h2>
+          <span style="font-size:0.75rem;color:var(--text-secondary);font-family:'Inter',sans-serif">
+            ${getUI('verses')}: ${verses.length}
+          </span>
+        </div>
+        <div class="sub">${englishName} · mot à mot</div>
+      </div>`;
+
+    verses.forEach(verse => {
+      const vWords = verse.words || [];
+      const tWords = transMap[verse.verse_key] || [];
+      const ayahNum = verse.verse_key.split(':')[1];
+
+      html += `<div class="ayah-block" id="wbw-${ayahNum}">
+        <div class="ayah-wby">`;
+
+      vWords.forEach((word, i) => {
+        const tw = tWords[i];
+        const mean = tw ? tw.text : (word.translation ? word.translation.text : '');
+        const translit = word.transliteration ? word.transliteration.text : '';
+        html += `<span class="wby-word">
+          <span class="ar">${word.text_uthmani}</span>
+          ${translit ? `<span class="translit">${translit}</span>` : ''}
+          ${mean ? `<span class="mean">${mean}</span>` : ''}
+        </span>`;
+      });
+
+      html += `</div>
+        <div style="text-align:center"><span class="wby-ayah-num">${ayahNum}</span></div>
+      </div>`;
+    });
+
+    html += `<div class="wby-notice">
+      ${getUI('prev') === '← Previous' ? 'Tap a word to see its meaning. Data from Quran.com' : 'Appuyez sur un mot pour voir son sens. Données de Quran.com'}
+    </div>
+    <div class="nav-buttons">
+      <button class="nav-btn" onclick="loadSurah(${num-1})" ${num===1?'disabled':''}>${getUI('prev')}</button>
+      <button class="nav-btn" onclick="toggleWordByWord()">${wbwMode ? '📖 Ayat' : '📖 Mot à mot'}</button>
+      <button class="nav-btn" onclick="loadSurah(${num+1})" ${num===114?'disabled':''}>${getUI('next')}</button>
+    </div></div>`;
+
+    container.innerHTML = html;
+    document.getElementById('headerTitle').textContent = name;
+
+    document.querySelectorAll('.surah-item').forEach(el => {
+      el.classList.toggle('active', parseInt(el.dataset.num) === num);
+    });
+
+    window.scrollTo(0, 0);
+
+  } catch (err) {
+    container.innerHTML = `
+      <div class="error-box">
+        <h3>${getUI('errorTitle')}</h3>
+        <p>Mot à mot indisponible. Veuillez réessayer.</p>
+        <button class="retry-btn" onclick="loadSurahWbw(${num})">${getUI('retry')}</button>
+        <button class="retry-btn sec" onclick="wbwMode=false;loadSurah(${num})">${getUI('index')}</button>
+      </div>`;
+  }
+}
+
+// Patch loadSurah to respect wbwMode
+const _origLoadSurah = loadSurah;
+loadSurah = function(num, highlightAyah, forceNormal) {
+  if (wbwMode && !forceNormal) {
+    loadSurahWbw(num);
+  } else {
+    _origLoadSurah(num, highlightAyah);
+  }
+};
 
 // ═══════════════════════════════════════════════
 //  START
