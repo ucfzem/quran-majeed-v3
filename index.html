@@ -1010,15 +1010,16 @@ function init() {
   window.addEventListener('online', updateOffline);
   window.addEventListener('offline', updateOffline);
   updateOffline();
-  // Hash routing
-  window.addEventListener('hashchange', handleHashChange);
-  handleHashChange();
+  // URL routing (query param ?surah=N)
+  window.addEventListener('popstate', handleURLChange);
+  handleURLChange();
 }
 
-function handleHashChange() {
-  const hash = window.location.hash.replace('#', '');
-  if (hash && !isNaN(hash) && +hash >= 1 && +hash <= 114) {
-    const num = parseInt(hash);
+function handleURLChange() {
+  const params = new URLSearchParams(window.location.search);
+  const surah = params.get('surah');
+  if (surah && !isNaN(surah) && +surah >= 1 && +surah <= 114) {
+    const num = parseInt(surah);
     if (num !== currentSurah) {
       loadSurah(num);
     }
@@ -1533,9 +1534,10 @@ function loadIndex() {
 
 async function loadSurah(num, highlightAyah) {
   currentSurah = num;
-  const hash = '#' + num;
-  if (window.location.hash !== hash) {
-    window.location.hash = hash;
+  const params = new URLSearchParams(window.location.search);
+  if (params.get('surah') !== String(num)) {
+    const url = window.location.pathname + '?surah=' + num + window.location.hash;
+    history.replaceState({ surah: num }, '', url);
   }
   const surah = SURAHS.find(s => s.n === num);
   const name = surah ? surah.a : `Surah ${num}`;
