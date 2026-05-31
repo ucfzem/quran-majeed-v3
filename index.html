@@ -1922,24 +1922,12 @@ async function loadSurahWbw(num) {
   const name = surah ? surah.a : `Surah ${num}`;
 
   try {
-    const [versesRes, transRes] = await Promise.all([
-      fetch(`https://api.quran.com/api/v4/quran/verses/uthmani?chapter_number=${num}`),
-      fetch(`https://api.quran.com/api/v4/quran/translations/${getWbwTransId()}?chapter_number=${num}`)
-    ]);
-
-    if (!versesRes.ok || !transRes.ok) throw new Error('API error');
-
-    const versesData = await versesRes.json();
-    const transData = await transRes.json();
-
-    const verses = versesData.verses || [];
-    const translations = transData.translations || [];
-
-    // Build translation map: verse_key -> words with translation
-    const transMap = {};
-    translations.forEach(t => {
-      transMap[t.verse_key] = t.words || [];
-    });
+    const res = await fetch(
+      `https://api.quran.com/api/v4/verses/by_chapter/${num}?words=true&word_fields=text_uthmani,translation,transliteration&per_page=300`
+    );
+    if (!res.ok) throw new Error('API error');
+    const data = await res.json();
+    const verses = data.verses || [];
 
     const englishName = verses[0]?.verse_key?.split(':')[0]
       ? SURAHS.find(s => s.n === num)?.e || ''
@@ -1960,16 +1948,15 @@ async function loadSurahWbw(num) {
       </div>`;
 
     verses.forEach(verse => {
-      const vWords = verse.words || [];
-      const tWords = transMap[verse.verse_key] || [];
-      const ayahNum = verse.verse_key.split(':')[1];
+      const words = verse.words || [];
+      const ayahNum = verse.verse_number;
 
       html += `<div class="ayah-block" id="wbw-${ayahNum}">
         <div class="ayah-wby">`;
 
-      vWords.forEach((word, i) => {
-        const tw = tWords[i];
-        const mean = tw ? tw.text : (word.translation ? word.translation.text : '');
+      words.forEach(word => {
+        if (word.char_type_name === 'end') return;
+        const mean = word.translation ? word.translation.text : '';
         const translit = word.transliteration ? word.transliteration.text : '';
         html += `<span class="wby-word">
           <span class="ar">${word.text_uthmani}</span>
