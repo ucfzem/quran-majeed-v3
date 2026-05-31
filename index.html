@@ -2,7 +2,7 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>القرآن الكريم - Quran Majeed</title>
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#004d40">
@@ -213,24 +213,31 @@
       --primary: #00695c;
       --primary-dark: #004d40;
       --primary-light: #4db6ac;
-      --gold: #c89a00;
-      --gold-light: #ffd700;
-      --bg: #f5f5f0;
+      --gold: #c9a84c;
+      --gold-light: #e8c97a;
+      --gold-dim: #8a6e2f;
+      --bg: #fdfaf4;
       --bg-card: #ffffff;
       --text: #1a1a2e;
       --text-secondary: #555;
       --border: #e0e0e0;
       --radius: 14px;
+      --frame-outer: #c9a84c;
+      --frame-inner: #b8962e;
+      --corner: #004d40;
     }
     body.dark {
       --primary: #1b5e20;
       --primary-dark: #0a3d0a;
       --primary-light: #81c784;
-      --bg: #0a0a0a;
-      --bg-card: #1a1a1a;
-      --text: #e0e0e0;
-      --text-secondary: #aaa;
-      --border: #333;
+      --bg: #0d1117;
+      --bg-card: #161b22;
+      --text: #e8d5a3;
+      --text-secondary: #8b949e;
+      --border: #30363d;
+      --frame-outer: #8b6914;
+      --frame-inner: #a0714f;
+      --corner: #6b4f12;
     }
 
     html, body { height: 100%; }
@@ -240,7 +247,48 @@
       background: var(--bg);
       color: var(--text);
       line-height: 1.7;
-      transition: background 0.3s, color 0.3s;
+      transition: background 0.3s, color 0.3s, border-color 0.3s;
+      position: relative;
+    }
+    body::before {
+      content: ''; position: fixed; inset: 8px;
+      border: 2px solid var(--frame-outer);
+      border-radius: 20px;
+      pointer-events: none; z-index: 9998;
+      transition: border-color 0.3s;
+      animation: frameReveal 1.2s ease-out forwards;
+      clip-path: inset(0 round 20px);
+    }
+    body::after {
+      content: ''; position: fixed; inset: 14px;
+      border: 1px solid var(--frame-inner);
+      border-radius: 16px;
+      pointer-events: none; z-index: 9997;
+      transition: border-color 0.3s;
+      opacity: 0.6;
+    }
+    @keyframes frameReveal {
+      0% { opacity: 0; transform: scale(0.97); }
+      100% { opacity: 1; transform: scale(1); }
+    }
+    .corner {
+      position: fixed; width: 60px; height: 60px;
+      pointer-events: none; z-index: 9999;
+      opacity: 0.25; transition: opacity 0.3s;
+    }
+    body.dark .corner { opacity: 0.15; }
+    .corner-tl { top: 10px; left: 10px; }
+    .corner-tr { top: 10px; right: 10px; transform: scaleX(-1); }
+    .corner-bl { bottom: 10px; left: 10px; transform: scaleY(-1); }
+    .corner-br { bottom: 10px; right: 10px; transform: scale(-1); }
+    @media (max-width: 480px) {
+      .corner { width: 36px; height: 36px; }
+      .corner-tl { top: 6px; left: 6px; }
+      .corner-tr { top: 6px; right: 6px; }
+      .corner-bl { bottom: 6px; left: 6px; }
+      .corner-br { bottom: 6px; right: 6px; }
+      body::before { inset: 4px; border-radius: 12px; }
+      body::after { inset: 8px; border-radius: 10px; }
     }
 
     /* ─── HEADER ─── */
@@ -351,11 +399,21 @@
     }
 
     .welcome {
-      text-align: center; margin-top: 80px; padding: 0 20px;
+      text-align: center; margin-top: 80px; padding: 40px 20px;
       font-family: 'Inter', sans-serif;
+      position: relative;
     }
+    .welcome::before, .welcome::after {
+      content: '❋';
+      display: block; font-size: 1.2rem; color: var(--gold); opacity: 0.3;
+    }
+    .welcome::before { margin-bottom: 12px; }
+    .welcome::after { margin-top: 16px; }
     .welcome-icon { font-size: 4rem; margin-bottom: 16px; }
-    .welcome h2 { font-size: 1.8rem; color: var(--primary); margin-bottom: 12px; }
+    .welcome h2 {
+      font-size: 2rem; color: var(--primary); margin-bottom: 12px;
+      font-family: 'Amiri', serif;
+    }
     body.dark .welcome h2 { color: var(--primary-light); }
     .welcome p { color: var(--text-secondary); font-size: 1rem; line-height: 1.6; }
 
@@ -377,11 +435,27 @@
       background: var(--bg-card); padding: 28px 16px;
       border-radius: var(--radius); margin-bottom: 20px;
       box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+      border: 1px solid var(--frame-outer);
     }
 
     .surah-header {
       text-align: center; margin-bottom: 28px;
-      padding-bottom: 20px; border-bottom: 3px solid var(--primary);
+      padding: 24px 16px 20px;
+      border-bottom: 2px solid var(--gold);
+      position: relative;
+    }
+    .surah-header::before, .surah-header::after {
+      content: ''; position: absolute;
+      width: 40px; height: 2px; background: var(--gold);
+      top: -1px;
+    }
+    .surah-header::before { left: 20%; }
+    .surah-header::after { right: 20%; }
+    .surah-header .basmala {
+      font-size: 1.6rem; line-height: 2.2;
+      color: var(--gold); opacity: 0.7;
+      margin-bottom: 12px;
+      font-family: 'Amiri', serif;
     }
     .surah-header h2 { font-size: 2rem; color: var(--primary); margin-bottom: 4px; }
     body.dark .surah-header h2 { color: var(--primary-light); }
@@ -403,10 +477,15 @@
 
     .ayah-translation {
       font-size: var(--translation-size); line-height: 1.7;
-      margin-top: 4px; padding-top: 4px;
-      border-top: 1px dashed var(--border);
+      margin-top: 8px; padding-top: 10px;
       direction: ltr; text-align: left;
       font-family: 'Inter', sans-serif; color: var(--text-secondary);
+      position: relative;
+    }
+    .ayah-translation::before {
+      content: '❁';
+      position: absolute; top: -7px; left: 50%; transform: translateX(-50%);
+      font-size: 0.65rem; color: var(--gold); opacity: 0.5;
     }
     body[dir="rtl"] .ayah-translation {
       text-align: right; direction: rtl;
@@ -619,6 +698,48 @@
 </head>
 <body dir="rtl">
 
+<!-- Ornamental corners -->
+<div class="corner corner-tl">
+  <svg viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M0 0h60v8H8v52H0V0z" fill="var(--corner)" opacity="0.4"/>
+    <circle cx="8" cy="8" r="4" fill="var(--gold)"/>
+    <path d="M20 2q-4 6-8 18" stroke="var(--gold)" stroke-width="1.5" fill="none" opacity="0.6"/>
+    <path d="M2 20q6-4 18-8" stroke="var(--gold)" stroke-width="1.5" fill="none" opacity="0.6"/>
+    <path d="M12 4l-2 2 2 2" stroke="var(--gold)" stroke-width="0.8" fill="none" opacity="0.5"/>
+    <path d="M4 12l2-2 2 2" stroke="var(--gold)" stroke-width="0.8" fill="none" opacity="0.5"/>
+  </svg>
+</div>
+<div class="corner corner-tr">
+  <svg viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M0 0h60v8H8v52H0V0z" fill="var(--corner)" opacity="0.4"/>
+    <circle cx="8" cy="8" r="4" fill="var(--gold)"/>
+    <path d="M20 2q-4 6-8 18" stroke="var(--gold)" stroke-width="1.5" fill="none" opacity="0.6"/>
+    <path d="M2 20q6-4 18-8" stroke="var(--gold)" stroke-width="1.5" fill="none" opacity="0.6"/>
+    <path d="M12 4l-2 2 2 2" stroke="var(--gold)" stroke-width="0.8" fill="none" opacity="0.5"/>
+    <path d="M4 12l2-2 2 2" stroke="var(--gold)" stroke-width="0.8" fill="none" opacity="0.5"/>
+  </svg>
+</div>
+<div class="corner corner-bl">
+  <svg viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M0 0h60v8H8v52H0V0z" fill="var(--corner)" opacity="0.4"/>
+    <circle cx="8" cy="8" r="4" fill="var(--gold)"/>
+    <path d="M20 2q-4 6-8 18" stroke="var(--gold)" stroke-width="1.5" fill="none" opacity="0.6"/>
+    <path d="M2 20q6-4 18-8" stroke="var(--gold)" stroke-width="1.5" fill="none" opacity="0.6"/>
+    <path d="M12 4l-2 2 2 2" stroke="var(--gold)" stroke-width="0.8" fill="none" opacity="0.5"/>
+    <path d="M4 12l2-2 2 2" stroke="var(--gold)" stroke-width="0.8" fill="none" opacity="0.5"/>
+  </svg>
+</div>
+<div class="corner corner-br">
+  <svg viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M0 0h60v8H8v52H0V0z" fill="var(--corner)" opacity="0.4"/>
+    <circle cx="8" cy="8" r="4" fill="var(--gold)"/>
+    <path d="M20 2q-4 6-8 18" stroke="var(--gold)" stroke-width="1.5" fill="none" opacity="0.6"/>
+    <path d="M2 20q6-4 18-8" stroke="var(--gold)" stroke-width="1.5" fill="none" opacity="0.6"/>
+    <path d="M12 4l-2 2 2 2" stroke="var(--gold)" stroke-width="0.8" fill="none" opacity="0.5"/>
+    <path d="M4 12l2-2 2 2" stroke="var(--gold)" stroke-width="0.8" fill="none" opacity="0.5"/>
+  </svg>
+</div>
+
 <!-- HEADER -->
 <header>
   <button class="wby-toggle" id="wbyToggle" onclick="toggleWordByWord()" title="Mot à mot">📖 Mot à mot</button>
@@ -723,11 +844,12 @@
 <!-- ═══ FIN BANNER ═══ -->
 
 <!-- FOOTER -->
-<footer style="text-align:center;padding:20px 16px;font-family:'Inter',sans-serif;font-size:0.82rem;color:var(--text-secondary);border-top:1px solid var(--border);margin-top:20px">
-  <p>🕌 القرآن الكريم • Quran Majeed</p>
-  <p style="margin-top:4px">114 sourates · 45+ langues · Gratuit</p>
+<footer style="text-align:center;padding:24px 16px 32px;font-family:'Inter',sans-serif;font-size:0.82rem;color:var(--text-secondary);border-top:2px solid var(--gold);margin-top:20px;position:relative">
+  <div style="font-size:1.5rem;margin-bottom:8px;opacity:0.3">❋</div>
+  <p style="font-family:'Amiri',serif;font-size:1.1rem;color:var(--gold);opacity:0.7">القرآن الكريم</p>
+  <p style="margin-top:4px">Quran Majeed · 114 sourates · 45+ langues · Gratuit</p>
   <img src="https://visitor-badge.laobi.icu/badge?page_id=ucfzem.quran-majeed" alt="visiteurs" style="margin:8px auto;display:block;border-radius:4px">
-  <p style="margin-top:8px;opacity:0.6">Créé avec ❤️ | <a href="https://ucfzem.github.io/quran-majeed-v3/" style="color:var(--primary);text-decoration:none">quran-majeed3.netlify.app</a> | <a href="https://ucfzem.github.io/liens/" style="color:var(--primary);text-decoration:none">Mes projets</a></p>
+  <p style="margin-top:8px;opacity:0.6">Créé avec ❤️ | <a href="https://ucfzem.github.io/quran-majeed-v3/" style="color:var(--gold);text-decoration:none">Quran Majeed</a> | <a href="https://ucfzem.github.io/liens/" style="color:var(--gold);text-decoration:none">Mes projets</a></p>
 </footer>
 
 <script>
@@ -1589,8 +1711,11 @@ async function loadSurah(num, highlightAyah) {
       ayahCount = arabicData.numberOfAyahs;
     }
 
+    const basmalaText = 'بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ';
+    const showBasmala = num !== 1 && num !== 9;
     let html = `<div class="surah-container">
       <div class="surah-header">
+        ${showBasmala ? `<div class="basmala">${basmalaText}</div>` : ''}
         <h2>${name}</h2>
           <div class="sub">${englishName} • ${ayahCount} ${getUI('verses')}</div>
           <div style="margin-top:12px;font-size:0.8rem;color:var(--text-secondary);font-family:'Inter',sans-serif;opacity:0.6">by yz · azer.tyu199p@gmail.com</div>
@@ -1761,8 +1886,11 @@ async function loadSurahWbw(num) {
       ? SURAHS.find(s => s.n === num)?.e || ''
       : '';
 
+    const basmalaText = 'بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ';
+    const showBasmala = num !== 1 && num !== 9;
     let html = `<div class="surah-container">
       <div class="surah-header">
+        ${showBasmala ? `<div class="basmala">${basmalaText}</div>` : ''}
         <div class="wby-header-row">
           <h2>${name}</h2>
           <span style="font-size:0.75rem;color:var(--text-secondary);font-family:'Inter',sans-serif">
