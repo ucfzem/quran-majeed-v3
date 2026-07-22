@@ -543,19 +543,25 @@
 
     /* ─── AYAH ACTIONS (Audio + Tafsir) ─── */
     .ayah-actions {
-      display: inline-flex; gap: 2px; margin: 0 4px; vertical-align: middle;
+      display: flex; gap: 6px; align-items: center; margin-top: 8px;
+      padding-top: 6px; border-top: 1px dashed var(--border);
+      font-family: 'Inter', sans-serif;
     }
     .ayah-play-btn, .ayah-tafsir-btn {
       background: none; border: none; cursor: pointer;
-      font-size: 0.85rem; padding: 4px 6px; opacity: 0.35;
+      font-size: 0.9rem; padding: 6px 10px; opacity: 0.7;
       transition: opacity 0.2s, transform 0.1s; line-height: 1;
+      border-radius: 6px; color: var(--text);
     }
     .ayah-play-btn:hover, .ayah-tafsir-btn:hover {
-      opacity: 1; transform: scale(1.15);
+      opacity: 1; transform: scale(1.1); background: rgba(0,105,92,0.08);
     }
-    .ayah-play-btn.playing { opacity: 1; color: var(--gold); }
+    body.dark .ayah-play-btn:hover, body.dark .ayah-tafsir-btn:hover {
+      background: rgba(255,255,255,0.08);
+    }
+    .ayah-play-btn.playing { opacity: 1; color: var(--gold); background: rgba(201,168,76,0.12); }
     .ayah-tafsir-content {
-      margin-top: 8px; padding: 12px 16px;
+      margin-top: 0; padding: 12px 16px;
       background: rgba(0,105,92,0.04); border-radius: 8px;
       border-right: 3px solid var(--gold);
       font-family: 'Amiri', serif; font-size: 1rem;
@@ -567,6 +573,24 @@
       color: var(--text-secondary); font-family: 'Inter', sans-serif;
       font-size: 0.85rem; text-align: center; padding: 8px;
     }
+    .ayah-playing {
+      background: rgba(201,168,76,0.08) !important;
+      border-radius: 10px;
+    }
+    body.dark .ayah-playing {
+      background: rgba(201,168,76,0.12) !important;
+    }
+    .surah-play-btn {
+      padding: 10px 22px; font-size: 0.9rem; font-weight: 600;
+      background: var(--primary); color: white; border: none;
+      border-radius: 10px; cursor: pointer; font-family: 'Inter', sans-serif;
+      transition: background 0.2s;
+    }
+    .surah-play-btn:hover { filter: brightness(1.1); }
+    .surah-play-btn.sec {
+      background: transparent; border: 1px solid var(--border); color: var(--text);
+    }
+    .surah-play-btn.sec:hover { background: rgba(255,255,255,0.05); }
 
 
     /* ─── AUDIO PLAYER BAR ─── */
@@ -1084,6 +1108,7 @@ const UI_TR = {
     noResults: '😔 No results found',
     searchError: '❌ Search failed. Try again.',
     results: 'results',
+    playAll: '▶ Play All',
   },
   fr: {
     headerTitle: 'Coran Majeed',
@@ -1097,6 +1122,7 @@ const UI_TR = {
     retry: '🔄 Réessayer', index: '📖 Index',
     prev: '← Précédente', next: 'Suivante →', verses: 'versets',
     themeLight: '☀️', themeDark: '🌙',
+    playAll: '▶ Tout écouter',
   },
   es: {
     headerTitle: 'Corán Majeed',
@@ -1114,6 +1140,7 @@ const UI_TR = {
     noResults: '😔 Sin resultados',
     searchError: '❌ Error al buscar. Intente de nuevo.',
     results: 'resultados',
+    playAll: '▶ Reproducir todo',
   },
   ar: {
     headerTitle: 'القرآن الكريم',
@@ -1131,6 +1158,7 @@ const UI_TR = {
     noResults: '😔 لا توجد نتائج',
     searchError: '❌ فشل البحث. حاول مرة أخرى.',
     results: 'نتيجة',
+    playAll: '▶ استمع للكل',
   },
   ur: {
     headerTitle: 'قرآن مجید',
@@ -1962,22 +1990,26 @@ async function loadSurah(num, highlightAyah) {
         ${showBasmala ? `<div class="basmala">${basmalaText}</div>` : ''}
         <h2>${name}</h2>
           <div class="sub">${englishName} • ${ayahCount} ${getUI('verses')}</div>
+          <div style="margin-top:8px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap">
+            <button class="surah-play-btn" onclick="playSurahAll(${num})">▶ ${getUI('playAll') || 'Play All'}</button>
+            <button class="surah-play-btn sec" onclick="closeAudioPlayer()">⏹ Stop</button>
+          </div>
           <div style="margin-top:12px;font-size:0.8rem;color:var(--text-secondary);font-family:'Inter',sans-serif;opacity:0.6">by yz · azer.tyu199p@gmail.com</div>
       </div>`;
 
 
     ayahs.forEach(ayah => {
       html += `<div class="ayah-block" id="ayah-${ayah.num}">
-        <div class="ayah-arabic">${ayah.arabic} <span class="ayah-num">${ayah.num}</span>
-          <span class="ayah-actions">
-            <button class="ayah-play-btn" data-surah="${num}" data-ayah="${ayah.num}" onclick="playAyah(${num},${ayah.num})" title="Listen">🔊</button>
-            <button class="ayah-tafsir-btn" onclick="toggleAyahTafsir(${num},${ayah.num})" title="Tafsir">📖</button>
-          </span>
-        </div>`;
+        <div class="ayah-arabic">${ayah.arabic} <span class="ayah-num">${ayah.num}</span></div>`;
       if (ayah.translation) {
         html += `<div class="ayah-translation">${ayah.translation}</div>`;
       }
-      html += `<div class="ayah-tafsir-content" id="tafsir-${num}-${ayah.num}" style="display:none"></div></div>`;
+      html += `<div class="ayah-actions">
+          <button class="ayah-play-btn" data-surah="${num}" data-ayah="${ayah.num}" onclick="playAyah(${num},${ayah.num})">🔊 Ayah ${ayah.num}</button>
+          <button class="ayah-tafsir-btn" onclick="toggleAyahTafsir(${num},${ayah.num})">📖 Tafsir</button>
+        </div>
+        <div class="ayah-tafsir-content" id="tafsir-${num}-${ayah.num}" style="display:none"></div>
+      </div>`;
     });
 
 
@@ -2183,11 +2215,9 @@ async function loadSurahWbw(num) {
 
 
       html += `</div>
-        <div style="text-align:center"><span class="wby-ayah-num">${ayahNum}</span>
-          <span class="ayah-actions">
-            <button class="ayah-play-btn" data-surah="${num}" data-ayah="${ayahNum}" onclick="playAyah(${num},${ayahNum})" title="Listen">🔊</button>
-            <button class="ayah-tafsir-btn" onclick="toggleAyahTafsir(${num},${ayahNum})" title="Tafsir">📖</button>
-          </span>
+        <div class="ayah-actions" style="justify-content:center;border-top:none;margin-top:4px">
+          <button class="ayah-play-btn" data-surah="${num}" data-ayah="${ayahNum}" onclick="playAyah(${num},${ayahNum})">🔊 Ayah ${ayahNum}</button>
+          <button class="ayah-tafsir-btn" onclick="toggleAyahTafsir(${num},${ayahNum})">📖 Tafsir</button>
         </div>
         <div class="ayah-tafsir-content" id="tafsir-${num}-${ayahNum}" style="display:none"></div>
       </div>`;
@@ -2254,6 +2284,25 @@ function playAyah(surah, ayah) {
   audioPlayer.play().catch(function() {});
   updatePlayBtn();
   showAudioBar();
+  highlightAyah(surah, ayah);
+}
+
+
+function playSurahAll(surah) {
+  autoPlay = true;
+  document.getElementById('autoPlayBtn').classList.add('active');
+  playAyah(surah, 1);
+}
+
+
+function highlightAyah(surah, ayah) {
+  var id = currentSurah > 0 && document.getElementById('wbw-' + ayah) ? 'wbw-' + ayah : 'ayah-' + ayah;
+  document.querySelectorAll('.ayah-playing').forEach(function(el) { el.classList.remove('ayah-playing'); });
+  var el = document.getElementById(id);
+  if (el) {
+    el.classList.add('ayah-playing');
+    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
 }
 
 

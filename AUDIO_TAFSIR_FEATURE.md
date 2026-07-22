@@ -9,7 +9,9 @@ Added per-ayah audio playback and inline Arabic tafsir to the Quran Majeed v3 si
 ## What was added
 
 ### Audio Playback
-- **🔊 Per-ayah play buttons** — Click the speaker icon on any ayah to stream MP3 from EveryAyah.com
+- **▶ Play All button** — In surah header, plays all ayat sequentially with auto-advance
+- **🔊 Per-ayah play buttons** — Click "🔊 Ayah N" in each ayah's action bar
+- **Auto-scroll + highlight** — Current ayah is highlighted with gold background and auto-scrolled into view
 - **🎵 Sticky audio player bar** — Fixed at bottom, shows when audio plays:
   - Surah name + ayah number
   - Play/Pause, Previous, Next buttons
