@@ -845,6 +845,7 @@
     .apb-btn{background:none;border:none;color:#fff;font-size:1.3rem;cursor:pointer;padding:6px 10px}
     .apb-btn.play{font-size:1.7rem}
     .apb-speed{font-size:.75rem;border:1px solid rgba(255,255,255,.4);border-radius:8px;padding:3px 8px;cursor:pointer;background:none;color:#fff}
+    .apb-continuous.on{color:var(--gold);text-shadow:0 0 8px rgba(212,175,55,.6)}
   </style>
     <!-- Cloudflare Web Analytics --><script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "a30fd89985dc4555b08862b0d83bb975"}'></script><!-- End Cloudflare Web Analytics -->
 </head>
@@ -968,6 +969,7 @@
     <button class="apb-btn play" id="apbPlayBtn" onclick="toggleAudioPlayback()">⏸</button>
     <button class="apb-btn" onclick="playNextAyah()" title="Suivant">⏭</button>
     <button class="apb-btn" onclick="skipAyahs(5)" title="+5">⏩</button>
+    <button class="apb-btn apb-continuous" id="apbContinuous" onclick="toggleContinuous()" title="Lecture continue">🔁</button>
     <button class="apb-speed" id="apbSpeed" onclick="cycleSpeed()">1.0x</button>
     <button class="apb-btn" onclick="closeAudioPlayer()">✕</button>
   </div>
@@ -1023,7 +1025,7 @@
   <p style="margin-top:8px;opacity:0.6">Créé avec ❤️ | <a href="https://ucfzem.github.io/quran-majeed-v3/" style="color:var(--gold);text-decoration:none">Quran Majeed</a> | <a href="https://ucfzem.github.io/liens/" style="color:var(--gold);text-decoration:none">Mes projets</a></p>
 </footer>
 
-<audio id="audioPlayer"></audio>
+
 
 
 <script>
@@ -2324,6 +2326,7 @@ document.addEventListener('click',e=>{if(!e.target.closest('#reciterBtn')&&!e.ta
 
 
 let playQueue=[],playIndex=-1,isPlaying=false,playingBismillah=false;
+let continuousMode=localStorage.getItem('continuousMode')==='1';
 let playerAudio=new Audio(),preloadAudio=new Audio();
 let playbackSpeeds=[0.75,1.0,1.25],speedIndex=1;
 
@@ -2387,6 +2390,12 @@ playerAudio.addEventListener('ended',async()=>{
     }catch(e){playAyah(playIndex+1);}
     return;
   }
+  if(playIndex+1>=playQueue.length&&continuousMode&&currentSurah<114){
+    await _origLoadSurah(currentSurah+1);
+    buildPlayQueue();
+    playAyah(0);
+    return;
+  }
   playAyah(playIndex+1);
 });
 function toggleAudioPlayback(){
@@ -2399,6 +2408,7 @@ function playPrevAyah(){playAyah(playIndex-1);}
 function stopAudioPlayback(){playerAudio.pause();isPlaying=false;playingBismillah=false;document.querySelectorAll('.ayah-block.active-ayah').forEach(el=>el.classList.remove('active-ayah'));}
 function closeAudioPlayer(){stopAudioPlayback();document.getElementById('audioPlayerBar').classList.remove('show');}
 function cycleSpeed(){speedIndex=(speedIndex+1)%playbackSpeeds.length;playerAudio.playbackRate=playbackSpeeds[speedIndex];document.getElementById('apbSpeed').textContent=playbackSpeeds[speedIndex]+'x';}
+function toggleContinuous(){continuousMode=!continuousMode;localStorage.setItem('continuousMode',continuousMode?'1':'0');document.getElementById('apbContinuous').classList.toggle('on',continuousMode);}
 
 
 // ═══════════════════════════════════════════════
@@ -2409,6 +2419,7 @@ function cycleSpeed(){speedIndex=(speedIndex+1)%playbackSpeeds.length;playerAudi
 window.onload = function() {
   init();
   preloadQuranData();
+  if(continuousMode)document.getElementById('apbContinuous').classList.add('on');
 
 
   if ('serviceWorker' in navigator) {
