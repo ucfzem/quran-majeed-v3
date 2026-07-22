@@ -1,0 +1,156 @@
+<!DOCTYPE html><html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lecteur Coran - Thème Brun Doré</title>
+    <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark-brown: #24160d;
+            --bg-card: #2c1c12;
+            --gold-text: #e6c687;
+            --white-text: #ffffff;
+            --green-accent: #1e4620;
+            --border-color: #3d2617;
+        }
+
+        body {
+            background-color: var(--bg-dark-brown);
+            color: var(--white-text);
+            font-family: 'Amiri', serif, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        .app-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #1a1009;
+            padding: 10px 15px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .app-bar .icon {
+            color: var(--gold-text);
+            margin-right: 12px;
+            cursor: pointer;
+            font-size: 1.1rem;
+        }
+
+        .right-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-word {
+            background-color: var(--green-accent);
+            color: var(--gold-text);
+            border: 1px solid var(--gold-text);
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            cursor: pointer;
+        }
+
+        .quran-container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .verse-block {
+            text-align: center;
+            padding: 15px 0;
+        }
+
+        .arabic-text {
+            color: var(--gold-text);
+            font-size: 1.8rem;
+            line-height: 2.2;
+            word-spacing: 2px;
+            margin-bottom: 15px;
+        }
+
+        .verse-number {
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            width: 35px;
+            height: 35px;
+            background: radial-gradient(circle, #d4af37 0%, #856514 100%);
+            border-radius: 50%;
+            color: #1a1009;
+            font-weight: bold;
+            font-size: 0.9rem;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.5);
+        }
+
+        .separator {
+            border-top: 1px dashed var(--border-color);
+            margin: 10px 0;
+        }
+
+        .tafsir-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 15px;
+            font-size: 0.9rem;
+            color: var(--gold-text);
+        }
+
+        .play-icon {
+            color: #d4af37;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <header class="app-bar">
+        <div class="menu-icons">
+            <span class="icon">☰</span>
+            <span class="icon">🔍</span>
+            <span class="icon badge">العربية</span>
+        </div>
+        <div class="center-icon">
+            <span class="icon sun">☀️</span>
+        </div>
+        <div class="right-actions">
+            <span class="icon">🎧</span>
+            <button class="btn-word">Mot à mot 📖</button>
+        </div>
+    </header>
+
+    <main class="quran-container">
+        <div class="verse-block">
+            <p class="arabic-text">
+                يَأَيُّهَا النَّاسُ اعْبُدُوا رَبَّكُمُ الَّذِي خَلَقَكُمْ وَالَّذِينَ مِنْ قَبْلِكُمْ لَعَلَّكُمْ تَتَّقُونَ
+            </p>
+            <div class="verse-number"><span>21</span></div>
+        </div>
+
+        <div class="separator"></div>
+
+        <div class="tafsir-bar">
+            <span class="tafsir-label">Tafsir 📖</span>
+            <span class="play-icon">▶</span>
+        </div>
+
+        <div class="verse-block">
+            <p class="arabic-text">
+                الَّذِي جَعَلَ لَكُمُ الْأَرْضَ فِرَاشًا وَالسَّمَاءَ بِنَاءً وَأَنْزَلَ مِنَ السَّمَاءِ مَاءً فَأَخْرَجَ بِهِ مِنَ الثَّمَرَاتِ رِزْقًا لَكُمْ فَلَا تَجْعَلُوا لِلَّهِ أَنْدَادًا وَأَنْتُمْ تَعْلَمُونَ
+            </p>
+            <div class="verse-number"><span>22</span></div>
+        </div>
+
+        <div class="separator"></div>
+
+        <div class="tafsir-bar">
+            <span class="tafsir-label">Tafsir 📖</span>
+            <span class="play-icon">▶</span>
+        </div>
+    </main>
+</body>
+</html>
