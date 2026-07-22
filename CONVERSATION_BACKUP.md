@@ -1,57 +1,63 @@
-# Conversation Backup — 2026-07-22
+# Conversation Backup — 2026-07-22 (Session 2)
 
-## Context
-Quran Majeed v3 — Quran reader web app (single `index.html` SPA).
+## Changes Made
 
-## Changes Made This Session
+### 1. Brown-Gold Dark Theme
+- Replaced dark gray/blue theme with brown (#24160d) and gold (#d4af37)
+- Verse number circles: bright gold gradient (#fff8e1 → #e6c687 → #d4af37)
 
-### 1. New Audio Engine (alquran.cloud API)
-- **Removed** old mp3quran.net / everyayah.com audio module
-- **Added** per-ayah audio via `api.alquran.cloud/v1/ayah/{surah}:{ayah}/{reciterId}`
-- **5 reciters**: الحصري، الشريم، العجمي، المعيقلي، المنشاوي
-- Reciter IDs resolved automatically on first launch via `/edition?format=audio&language=ar`
-- Speed control: 0.75x / 1.0x / 1.25x
-- Preloading next ayah for seamless playback
+### 2. Bismillah Audio
+- Plays بسم الله الرحمن الرحيم before ayah 1 of every surah
+- Except At-Tawbah (surah 9) which has no Bismillah
+- Shows "بسم الله — آية 1 / X" in player bar
 
-### 2. UI Additions
-- **🎧 Reciter button** in header with dropdown (replaces old `<select>` in surah card)
-- **Fixed audio player bar** at bottom of screen (⏮ ⏸ ⏭ speed ✕)
-- **▶️ button per ayah** in ayah actions row
-- **CSS**: `.active-ayah` highlight, `.reciter-dropdown`, `.audio-player-bar`
+### 3. Audio Player Improvements
+- **Progress bar** (clickable to seek)
+- **Skip ±5 ayahs** buttons (⏪/⏩)
+- **Ayah counter** (آية X / total)
+- **Tap anywhere** on verse to play (not just the number)
 
-### 3. Bug Fixes
-- **Fixed `highlightAyah` conflict** — parameter vs function name clash in `loadSurah()` → renamed param to `scrollToAyah`
-- **Fixed surah-switch audio leak** — added `stopAudioPlayback()` + `closeAudioPlayer()` at start of `loadSurah()`
-- **Removed old `<audio>` tag `onended`** handler pointing to deleted function
-- **Removed old audio controls** from surah header (redundant with new player bar)
+### 4. Continuous Mode (🔁)
+- Toggle button in player bar
+- When enabled, auto-plays next surah after current one finishes
+- Saves preference to localStorage
 
-### 4. Service Worker Fix
-- New `sw.js` passes through all external API requests (alquran.cloud, quran.com)
-- Only caches local static assets
-- Fixes "Connection issue" error on GitHub Pages
+### 5. Media Session API
+- Background/lock-screen playback
+- Shows surah name + ayah in notification
+- Play/pause/prev/next controls in lock screen
 
-### 5. Deployment Config
-- Added `vercel.json` for Vercel deployment
+### 6. Bug Fixes
+- Removed old mp3quran.net audio module
+- Fixed highlightAyah parameter/function naming conflict
+- Fixed Bismillah infinite loop
+- Fixed audio not stopping when switching surah
+- Fixed sw.js blocking API calls
 
-## Links
-- **GitHub Pages**: https://ucfzem.github.io/quran-majeed-v3/
-- **Cloudflare Workers**: https://ucfzem.azer-tyu199p.workers.dev/quran-majeed-v3/
-- **Vercel**: Import repo on vercel.com/new (vercel.json ready)
-- **Netlify**: Auto-deploys from push (netlify.toml configured)
+### 7. Deployments
+- Vercel: https://quran-majeed-v3.vercel.app
+- Cloudflare Workers: https://quran-majeed.azer-tyu199p.workers.dev
+- GitHub Pages: https://ucfzem.github.io/quran-majeed-v3/
 
 ## Git Log
 ```
+808cec1 feat: Media Session API for background/lock-screen playback
+e16456d feat: continuous mode + remove unused audio tag
+23f3d56 fix: enable workers_dev in wrangler.toml
+e036e97 feat: tap anywhere on verse to play + event.stopPropagation on buttons
+58c6805 feat: better audio player - progress bar, skip ±5, ayah counter
+46cb281 fix: Bismillah no longer loops, plays ayah 1 after
+15a3e19 feat: play Bismillah before first ayah (except At-Tawbah)
+c84ffd9 feat: brown-gold dark theme integrated
+c3e8d32 fix: verse number circles brighter in dark mode
 419bc02 fix: stop audio when switching surah
-e765741 fix: remove old audio module, fix highlightAyah conflict, unify to new player
+e765741 fix: remove old audio module, fix highlightAyah conflict
 55be5ff fix: pass-through sw.js for API calls + add vercel.json
 973bf1c feat: 5 reciters via alquran.cloud API + per-ayah audio + player bar
 ```
 
-## Key Code Architecture
-- `RECITERS[]` — array of 5 reciters with keys
-- `RECITER_MATCH{}` — fuzzy matching against alquran.cloud edition list
-- `resolveReciterIds()` — async, resolves once, cached in localStorage
-- `buildPlayQueue()` — builds queue from `.ayah-block` DOM elements
-- `playFromAyah(surah, ayah)` — entry point: builds queue, starts at specific ayah
-- `playAyah(index)` — fetches audio URL, plays, highlights, preloads next
-- `playerAudio` / `preloadAudio` — two `Audio()` instances for smooth transitions
+## Architecture
+- **Audio Engine**: `api.alquran.cloud/v1/ayah/{surah}:{ayah}/{reciterId}`
+- **Reciters**: الحصري، الشريم، العجمي، المعيقلي، المنشاوي (auto-resolved)
+- **Media Session**: Background playback + lock screen controls
+- **Continuous Mode**: Auto-advances to next surah (localStorage)
