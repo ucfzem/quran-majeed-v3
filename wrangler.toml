@@ -1,6 +1,7 @@
 name = "quran-majeed"
 main = "_worker.js"
 compatibility_date = "2026-05-01"
+workers_dev = true
 
 [assets]
 directory = "./"
