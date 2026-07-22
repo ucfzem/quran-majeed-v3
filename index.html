@@ -533,6 +533,24 @@
     }
 
 
+    .audioError {
+      background: rgba(244, 67, 54, 0.1); border: 1px solid rgba(244, 67, 54, 0.3);
+      color: #c62828; padding: 10px 14px; border-radius: 8px; margin-top: 10px;
+      font-size: 0.85rem; font-family: 'Inter', sans-serif;
+    }
+    body.dark .audioError {
+      background: rgba(244, 67, 54, 0.15); color: #ef9a9a;
+    }
+    .audioStopBtn {
+      background: rgba(244, 67, 54, 0.1); border: 1px solid rgba(244, 67, 54, 0.3);
+      color: #c62828; padding: 4px 12px; border-radius: 6px; font-size: 0.8rem;
+      cursor: pointer; margin-top: 6px; font-family: 'Inter', sans-serif;
+    }
+    body.dark .audioStopBtn {
+      background: rgba(244, 67, 54, 0.15); color: #ef9a9a;
+    }
+
+
     .ayah-arabic {
       font-size: var(--ayah-size); line-height: 2.4;
       font-family: 'Amiri', serif; text-align: right;
@@ -1924,20 +1942,22 @@ async function loadSurah(num, highlightAyah) {
               <label for="reciterSelect">🎤 ${getUI('reciter') || 'Reciter'}:</label>
               <select id="reciterSelect" class="reciter-dropdown" onchange="changeReciter(this.value)">
                 <option value="ar.alafasy" ${currentReciter==='ar.alafasy'?'selected':''}>مشاري العفاسي</option>
-                <option value="ar.abdulbasit" ${currentReciter==='ar.abdulbasit'?'selected':''}>عبد الباسط عبد الصمد</option>
-                <option value="ar.sudais" ${currentReciter==='ar.sudais'?'selected':''}>عبد الرحمن السديس</option>
+                <option value="ar.abdulrahmanalsudaes" ${currentReciter==='ar.abdulrahmanalsudaes'?'selected':''}>عبد الرحمن السديس</option>
                 <option value="ar.minshawi" ${currentReciter==='ar.minshawi'?'selected':''}>محمد صديق المنشاوي</option>
-                <option value="ar.shuraym" ${currentReciter==='ar.shuraym'?'selected':''}>سعود الشريم</option>
+                <option value="ar.mahermuaiqly" ${currentReciter==='ar.mahermuaiqly'?'selected':''}>ماهر المعيقلي</option>
+                <option value="ar.saadghamdi" ${currentReciter==='ar.saadghamdi'?'selected':''}>سعد الغامدي</option>
               </select>
             </div>
-            <button class="audio-main-btn" id="playPauseBtn" onclick="togglePlayPause()">▶ ${getUI('play') || 'Play'}</button>
+            <button class="audio-main-btn" id="audioPlayBtn" onclick="togglePlaySurah()">
+              ▶ <span id="audioBtnText">${getUI('play')}</span>
+            </button>
           </div>
       </div>`;
 
 
     ayahs.forEach(ayah => {
       html += `<div class="ayah-block" id="ayah-${ayah.num}">
-        <div class="ayah-arabic">${ayah.arabic} <span class="ayah-num" onclick="playAyah(${num},${ayah.num})">${ayah.num}</span></div>`;
+        <div class="ayah-arabic">${ayah.arabic} <span class="ayah-num" onclick="playAyahAudio(${ayah.num})">${ayah.num}</span></div>`;
       if (ayah.translation) {
         html += `<div class="ayah-translation">${ayah.translation}</div>`;
       }
@@ -2198,107 +2218,127 @@ async function loadSurahWbw(num) {
 
 
 // ═══════════════════════════════════════════════
-//  AUDIO
+//  AUDIO MODULE - mp3quran.net + EveryAyah fallback
 // ═══════════════════════════════════════════════
 
 
 var currentAyah = 0;
+var playing = false;
 
 
-function getReciterFolder(reciterCode) {
-  var folders = {
-    'ar.alafasy': 'Alafasy_128kbps',
-    'ar.abdulbasit': 'Abdul_Basit_Murattal_192kbps',
-    'ar.sudais': 'Abdurrahmaan_As-Sudais_192kbps',
-    'ar.minshawi': 'Minshawy_Murattal_128kbps',
-    'ar.shuraym': 'Saood_ash-Shuraym_128kbps'
+function getAudioUrl(surahNum, ayahNum) {
+  var surahObj = SURAHS.find(function(s) { return s.n === surahNum; });
+  var reciters = {
+    'ar.alafasy':       { server: 'server8.mp3quran.net',   folder: 'afs' },
+    'ar.abdulrahmanalsudaes': { server: 'server11.mp3quran.net', folder: 'sds' },
+    'ar.minshawi':      { server: 'server10.mp3quran.net',  folder: 'minsh' },
+    'ar.mahermuaiqly':  { server: 'server12.mp3quran.net',  folder: 'maher' },
+    'ar.saadghamdi':    { server: 'server7.mp3quran.net',   folder: 's_gmd' }
   };
-  return folders[reciterCode] || 'Alafasy_128kbps';
+
+  var r = reciters[currentReciter] || reciters['ar.alafasy'];
+  var pads = String(surahNum).padStart(3, '0');
+  return 'https://' + r.server + '/' + r.folder + '/' + pads + '.mp3';
 }
 
 
-function getAyahUrl(surah, ayah) {
-  var folder = getReciterFolder(currentReciter);
-  var ss = String(surah).padStart(3, '0');
-  var aa = String(ayah).padStart(3, '0');
-  return 'https://everyayah.com/data/' + folder + '/' + ss + aa + '.mp3';
+function getAyahAudioUrl(surahNum, ayahNum) {
+  var surahObj = SURAHS.find(function(s) { return s.n === surahNum; });
+  if (!surahObj) return null;
+
+  var padA = String(surahNum).padStart(3, '0') + String(ayahNum).padStart(3, '0');
+
+  var reciters = {
+    'ar.alafasy':       'Alafasy_128kbps',
+    'ar.abdulrahmanalsudaes': 'Abdurrahmaan_As-Sudais_192kbps',
+    'ar.minshawi':      'Minshawy_Murattal_128kbps',
+    'ar.mahermuaiqly':  'Maher_AlMuaiqly_128kbps',
+    'ar.saadghamdi':    'Abdul_Basit_Murattal_192kbps'
+  };
+
+  var folder = reciters[currentReciter] || reciters['ar.alafasy'];
+  return 'https://everyayah.com/data/' + folder + '/' + padA + '.mp3';
 }
 
 
-function highlightAyah(ayah) {
-  document.querySelectorAll('.ayah-block').forEach(function(el) { el.classList.remove('playing'); });
-  var el = document.getElementById('ayah-' + ayah);
-  if (el) el.classList.add('playing');
-}
-
-
-function loadAyah(surah, ayah) {
-  var audio = document.getElementById('audioPlayer');
-  currentAyah = ayah;
-  audio.src = getAyahUrl(surah, ayah);
-  audio.load();
-  audio.play();
-  highlightAyah(ayah);
-  var btn = document.getElementById('playPauseBtn');
-  if (btn) btn.textContent = '⏸ ' + (getUI('pause') || 'Pause');
-}
-
-
-function togglePlayPause() {
-  var audio = document.getElementById('audioPlayer');
-  var btn = document.getElementById('playPauseBtn');
-  if (!currentSurah) return;
-  if (!audio.src || currentAyah === 0) {
-    loadAyah(currentSurah, 1);
-    return;
+function highlightAyah(ayahNum) {
+  document.querySelectorAll('.ayah-block').forEach(function(el) {
+    el.classList.remove('playing');
+  });
+  if (ayahNum) {
+    var el = document.getElementById('ayah-' + ayahNum);
+    if (el) el.classList.add('playing');
   }
-  if (audio.paused) {
-    audio.play();
-    if (btn) btn.textContent = '⏸ ' + (getUI('pause') || 'Pause');
+}
+
+
+function playAyahAudio(ayahNum) {
+  var audio = document.getElementById('audioPlayer');
+  if (!audio) return;
+  audio.src = getAyahAudioUrl(currentSurah, ayahNum);
+  currentAyah = ayahNum;
+  highlightAyah(ayahNum);
+  playing = true;
+
+  var btnText = document.getElementById('audioBtnText');
+  if (btnText) btnText.textContent = getUI('pause');
+
+  audio.play().catch(function(err) {
+    console.error('Audio error:', err.message);
+    stopAudio();
+  });
+}
+
+
+function togglePlaySurah() {
+  var audio = document.getElementById('audioPlayer');
+  if (!audio) return;
+
+  if (!playing) {
+    if (audio.paused && audio.src) {
+      audio.play().catch(function() {});
+      playing = true;
+      var btnText = document.getElementById('audioBtnText');
+      if (btnText) btnText.textContent = getUI('pause');
+    } else {
+      playAyahAudio(1);
+    }
   } else {
     audio.pause();
-    if (btn) btn.textContent = '▶ ' + (getUI('play') || 'Play');
-  }
-}
-
-
-function playAyah(surah, ayahNum) {
-  if (surah !== currentSurah) return;
-  loadAyah(surah, ayahNum);
-}
-
-
-function nextAyah() {
-  if (!currentSurah || !currentAyah) return;
-  var surahObj = SURAHS.find(function(s) { return s.n === currentSurah; });
-  if (!surahObj) return;
-  if (currentAyah < surahObj.ayahs) {
-    loadAyah(currentSurah, currentAyah + 1);
-  } else {
-    currentAyah = 0;
-    highlightAyah(0);
-    var btn = document.getElementById('playPauseBtn');
-    if (btn) btn.textContent = '▶ ' + (getUI('play') || 'Play');
-  }
-}
-
-
-function changeReciter(code) {
-  currentReciter = code;
-  localStorage.setItem('quranReciter', code);
-  if (currentSurah && currentAyah > 0) {
-    loadAyah(currentSurah, currentAyah);
-  } else if (currentSurah) {
-    var audio = document.getElementById('audioPlayer');
-    var btn = document.getElementById('playPauseBtn');
-    audio.src = '';
-    if (btn) btn.textContent = '▶ ' + (getUI('play') || 'Play');
+    playing = false;
+    var btnText = document.getElementById('audioBtnText');
+    if (btnText) btnText.textContent = getUI('play');
   }
 }
 
 
 function audioEnded() {
-  nextAyah();
+  var surahObj = SURAHS.find(function(s) { return s.n === currentSurah; });
+  if (!surahObj || currentAyah >= surahObj.ayahs) {
+    stopAudio();
+    return;
+  }
+  playAyahAudio(currentAyah + 1);
+}
+
+
+function stopAudio() {
+  var audio = document.getElementById('audioPlayer');
+  if (audio) { audio.pause(); audio.src = ''; }
+  playing = false;
+  currentAyah = 0;
+  highlightAyah(0);
+  var btnText = document.getElementById('audioBtnText');
+  if (btnText) btnText.textContent = getUI('play');
+}
+
+
+function changeReciter(reciter) {
+  currentReciter = reciter;
+  localStorage.setItem('quranReciter', reciter);
+  if (playing && currentSurah) {
+    playAyahAudio(currentAyah || 1);
+  }
 }
 
 
