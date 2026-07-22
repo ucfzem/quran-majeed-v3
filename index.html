@@ -2407,9 +2407,12 @@ playerAudio.addEventListener('ended',async()=>{
     return;
   }
   if(playIndex+1>=playQueue.length&&continuousMode&&currentSurah<114){
-    await _origLoadSurah(currentSurah+1);
-    buildPlayQueue();
-    playAyah(0);
+    try{
+      await _origLoadSurah(currentSurah+1);
+      await new Promise(r=>setTimeout(r,200));
+      buildPlayQueue();
+      if(playQueue.length>0)playAyah(0);
+    }catch(e){stopAudioPlayback();}
     return;
   }
   playAyah(playIndex+1);
