@@ -2281,7 +2281,7 @@ function playAyah(surah, ayah) {
   }
   playingAyah = { surah: surah, ayah: ayah };
   audioPlayer.src = getAudioUrl(surah, ayah, currentReciter);
-  audioPlayer.play().catch(function() {});
+  audioPlayer.play().catch(function(e) { console.log('Audio error:', e); });
   updatePlayBtn();
   showAudioBar();
   highlightAyah(surah, ayah);
@@ -2382,7 +2382,7 @@ function changeReciter(reciter) {
 function fetchTafsir(surah, ayah) {
   var key = surah + ':' + ayah;
   if (tafsirCache[key]) return Promise.resolve(tafsirCache[key]);
-  return fetch('https://api.alquran.cloud/v1/ayah/' + key)
+  return fetch('https://api.alquran.cloud/v1/ayah/' + key + '/ar.muyassar')
     .then(function(r) { if (!r.ok) throw new Error(); return r.json(); })
     .then(function(d) {
       var text = d.data.text;

@@ -26,7 +26,8 @@ Added per-ayah audio playback and inline Arabic tafsir to the Quran Majeed v3 si
 
 ### Tafsir
 - **📖 Per-ayah tafsir buttons** — Click to expand inline Arabic tafsir below the ayah
-- **Tafsir source**: `api.alquran.cloud/v1/ayah/{surah}:{ayah}` (returns Arabic tafsir text)
+- **Tafsir source**: `api.alquran.cloud/v1/ayah/{surah}:{ayah}/ar.muyassar` (Tafsir Al-Muyassar, simplified Arabic tafsir)
+- **Tafsir options available**: `ar.muyassar` (simplified), `ar.jalalayn` (Jalalayn), `ar.qurtubi`, `ar.baghawi`, `ar.waseet`, `ar.miqbas`
 - **In-memory cache** — Once fetched, tafsir is cached for the session
 - **Inline display** — Gold right-border, Amiri font, appears below translation
 
