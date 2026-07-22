@@ -2405,7 +2405,12 @@ function toggleAudioPlayback(){
 }
 function playNextAyah(){playAyah(playIndex+1);}
 function playPrevAyah(){playAyah(playIndex-1);}
-function stopAudioPlayback(){playerAudio.pause();isPlaying=false;playingBismillah=false;document.querySelectorAll('.ayah-block.active-ayah').forEach(el=>el.classList.remove('active-ayah'));}
+function stopAudioPlayback(){
+  playerAudio.pause();isPlaying=false;playingBismillah=false;
+  document.querySelectorAll('.ayah-block.active-ayah').forEach(el=>el.classList.remove('active-ayah'));
+  try{if(bgOsc){bgOsc.stop();bgOsc.disconnect();bgOsc=null;}}catch(e){}
+  try{if(bgAudioCtx){bgAudioCtx.close();bgAudioCtx=null;}}catch(e){}
+}
 function closeAudioPlayer(){stopAudioPlayback();document.getElementById('audioPlayerBar').classList.remove('show');}
 function cycleSpeed(){speedIndex=(speedIndex+1)%playbackSpeeds.length;playerAudio.playbackRate=playbackSpeeds[speedIndex];document.getElementById('apbSpeed').textContent=playbackSpeeds[speedIndex]+'x';}
 function toggleContinuous(){continuousMode=!continuousMode;localStorage.setItem('continuousMode',continuousMode?'1':'0');document.getElementById('apbContinuous').classList.toggle('on',continuousMode);}
@@ -2429,6 +2434,34 @@ window.onload = function() {
     });
   }
 };
+
+
+// ═══════════════════════════════════════════════
+//  BACKGROUND AUDIO (lecture écran éteint)
+// ═══════════════════════════════════════════════
+
+
+let bgAudioCtx = null;
+let bgOsc = null;
+
+
+document.addEventListener('visibilitychange', function() {
+  if (document.hidden && isPlaying) {
+    // iOS Safari workaround: keep audio context alive when screen locks
+    try {
+      bgAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      if (bgAudioCtx.state === 'suspended') bgAudioCtx.resume();
+      bgOsc = bgAudioCtx.createOscillator();
+      bgOsc.frequency.value = 0.001; // inaudible
+      bgOsc.connect(bgAudioCtx.destination);
+      bgOsc.start();
+    } catch(e) {}
+  } else if (!document.hidden) {
+    // Screen back on — clean up
+    try { if (bgOsc) { bgOsc.stop(); bgOsc.disconnect(); bgOsc = null; } } catch(e) {}
+    try { if (bgAudioCtx) { bgAudioCtx.close(); bgAudioCtx = null; } } catch(e) {}
+  }
+});
 </script>
 </body>
 </html>
