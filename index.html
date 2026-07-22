@@ -541,25 +541,24 @@
     body.dark .ayah-num { background: radial-gradient(circle at 30% 30%, #fff, var(--gold-light), var(--gold)); }
 
 
-    /* ─── AYAH ACTIONS (Audio + Tafsir) ─── */
+    /* ─── AYAH ACTIONS (Tafsir only) ─── */
     .ayah-actions {
       display: flex; gap: 6px; align-items: center; margin-top: 8px;
       padding-top: 6px; border-top: 1px dashed var(--border);
       font-family: 'Inter', sans-serif;
     }
-    .ayah-play-btn, .ayah-tafsir-btn {
+    .ayah-tafsir-btn {
       background: none; border: none; cursor: pointer;
       font-size: 0.9rem; padding: 6px 10px; opacity: 0.7;
       transition: opacity 0.2s, transform 0.1s; line-height: 1;
       border-radius: 6px; color: var(--text);
     }
-    .ayah-play-btn:hover, .ayah-tafsir-btn:hover {
+    .ayah-tafsir-btn:hover {
       opacity: 1; transform: scale(1.1); background: rgba(0,105,92,0.08);
     }
-    body.dark .ayah-play-btn:hover, body.dark .ayah-tafsir-btn:hover {
+    body.dark .ayah-tafsir-btn:hover {
       background: rgba(255,255,255,0.08);
     }
-    .ayah-play-btn.playing { opacity: 1; color: var(--gold); background: rgba(201,168,76,0.12); }
     .ayah-tafsir-content {
       margin-top: 0; padding: 12px 16px;
       background: rgba(0,105,92,0.04); border-radius: 8px;
@@ -572,73 +571,6 @@
     .ayah-tafsir-loading {
       color: var(--text-secondary); font-family: 'Inter', sans-serif;
       font-size: 0.85rem; text-align: center; padding: 8px;
-    }
-    .ayah-playing {
-      background: rgba(201,168,76,0.08) !important;
-      border-radius: 10px;
-    }
-    body.dark .ayah-playing {
-      background: rgba(201,168,76,0.12) !important;
-    }
-    .surah-play-btn {
-      padding: 10px 22px; font-size: 0.9rem; font-weight: 600;
-      background: var(--primary); color: white; border: none;
-      border-radius: 10px; cursor: pointer; font-family: 'Inter', sans-serif;
-      transition: background 0.2s;
-    }
-    .surah-play-btn:hover { filter: brightness(1.1); }
-    .surah-play-btn.sec {
-      background: transparent; border: 1px solid var(--border); color: var(--text);
-    }
-    .surah-play-btn.sec:hover { background: rgba(255,255,255,0.05); }
-
-
-    /* ─── AUDIO PLAYER BAR ─── */
-    .audio-bar {
-      position: fixed; bottom: -100px; left: 0; right: 0;
-      background: var(--primary-dark); color: white;
-      z-index: 1000; transition: bottom 0.3s ease;
-      box-shadow: 0 -2px 12px rgba(0,0,0,0.25);
-      padding: 0 16px;
-    }
-    .audio-bar.show { bottom: 0; }
-    .audio-bar-inner {
-      max-width: 950px; margin: 0 auto;
-      display: flex; align-items: center; justify-content: space-between;
-      gap: 10px; padding: 10px 0; flex-wrap: wrap;
-    }
-    .audio-bar-info {
-      display: flex; flex-direction: column;
-      font-family: 'Inter', sans-serif; min-width: 0;
-    }
-    .audio-bar-name { font-size: 0.9rem; font-weight: 600; }
-    .audio-bar-ayah { font-size: 0.75rem; opacity: 0.7; }
-    .audio-bar-controls { display: flex; align-items: center; gap: 6px; }
-    .audio-bar-btn {
-      background: none; border: none; color: white;
-      font-size: 1.15rem; cursor: pointer; padding: 6px 8px;
-      border-radius: 6px; transition: background 0.2s;
-      display: flex; align-items: center; justify-content: center;
-    }
-    .audio-bar-btn:hover { background: rgba(255,255,255,0.15); }
-    .audio-bar-play {
-      font-size: 1.4rem; background: var(--gold); color: #333;
-      width: 38px; height: 38px; border-radius: 50%;
-    }
-    .audio-bar-play:hover { filter: brightness(1.1); }
-    .audio-bar-extras { display: flex; align-items: center; gap: 4px; }
-    .reciter-select {
-      background: rgba(255,255,255,0.15); color: white;
-      border: 1px solid rgba(255,255,255,0.3); border-radius: 6px;
-      padding: 5px 8px; font-size: 0.75rem; cursor: pointer;
-      font-family: 'Inter', sans-serif;
-    }
-    .reciter-select option { background: #222; color: white; }
-    .auto-play-btn.active { color: var(--gold); }
-
-    @media (max-width: 480px) {
-      .audio-bar-inner { flex-direction: column; gap: 6px; }
-      .audio-bar-extras { width: 100%; justify-content: center; }
     }
 
 
@@ -1004,30 +936,6 @@
 </footer>
 
 
-<!-- AUDIO PLAYER BAR -->
-<div class="audio-bar" id="audioBar">
-  <div class="audio-bar-inner">
-    <div class="audio-bar-info">
-      <span class="audio-bar-name" id="audioBarName"></span>
-      <span class="audio-bar-ayah" id="audioBarAyah"></span>
-    </div>
-    <div class="audio-bar-controls">
-      <button class="audio-bar-btn" onclick="prevAyahAudio()" title="Previous">⏮</button>
-      <button class="audio-bar-btn audio-bar-play" id="audioBarPlayBtn" onclick="toggleAudioPlay()">▶</button>
-      <button class="audio-bar-btn" onclick="nextAyahAudio()" title="Next">⏭</button>
-    </div>
-    <div class="audio-bar-extras">
-      <button class="audio-bar-btn auto-play-btn" id="autoPlayBtn" onclick="toggleAutoPlay()" title="Auto-play">🔁</button>
-      <select class="reciter-select" id="reciterSelect" onchange="changeReciter(this.value)">
-        <option value="Alafasy_128kbps">Mishary Alafasy</option>
-        <option value="Abdul_Basit_Murattal_128kbps">Abdul Basit</option>
-        <option value="Saad_Al-Ghamadi_128kbps">Saad Al-Ghamadi</option>
-      </select>
-      <button class="audio-bar-btn" onclick="closeAudioPlayer()" title="Close">✕</button>
-    </div>
-  </div>
-</div>
-
 
 <script>
 
@@ -1108,7 +1016,6 @@ const UI_TR = {
     noResults: '😔 No results found',
     searchError: '❌ Search failed. Try again.',
     results: 'results',
-    playAll: '▶ Play All',
   },
   fr: {
     headerTitle: 'Coran Majeed',
@@ -1122,7 +1029,6 @@ const UI_TR = {
     retry: '🔄 Réessayer', index: '📖 Index',
     prev: '← Précédente', next: 'Suivante →', verses: 'versets',
     themeLight: '☀️', themeDark: '🌙',
-    playAll: '▶ Tout écouter',
   },
   es: {
     headerTitle: 'Corán Majeed',
@@ -1140,7 +1046,6 @@ const UI_TR = {
     noResults: '😔 Sin resultados',
     searchError: '❌ Error al buscar. Intente de nuevo.',
     results: 'resultados',
-    playAll: '▶ Reproducir todo',
   },
   ar: {
     headerTitle: 'القرآن الكريم',
@@ -1158,7 +1063,6 @@ const UI_TR = {
     noResults: '😔 لا توجد نتائج',
     searchError: '❌ فشل البحث. حاول مرة أخرى.',
     results: 'نتيجة',
-    playAll: '▶ استمع للكل',
   },
   ur: {
     headerTitle: 'قرآن مجید',
@@ -1298,12 +1202,6 @@ let currentLang = localStorage.getItem('quranLang') || 'en.sahih';
 let touchStartDist = 0;
 let quranData = null;
 
-// Audio state
-let currentReciter = localStorage.getItem('quranReciter') || 'Alafasy_128kbps';
-let audioPlayer = null;
-let playingAyah = null;
-let autoPlay = false;
-
 // Tafsir state
 let tafsirCache = {};
 
@@ -1324,8 +1222,6 @@ function init() {
     document.body.classList.add('dark');
     document.getElementById('themeBtn').textContent = '☀️';
   }
-  // Restore reciter
-  document.getElementById('reciterSelect').value = currentReciter;
   // Offline detection
   const banner = document.getElementById('offlineBanner');
   function updateOffline() {
@@ -1990,10 +1886,6 @@ async function loadSurah(num, highlightAyah) {
         ${showBasmala ? `<div class="basmala">${basmalaText}</div>` : ''}
         <h2>${name}</h2>
           <div class="sub">${englishName} • ${ayahCount} ${getUI('verses')}</div>
-          <div style="margin-top:8px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap">
-            <button class="surah-play-btn" onclick="playSurahAll(${num})">▶ ${getUI('playAll') || 'Play All'}</button>
-            <button class="surah-play-btn sec" onclick="closeAudioPlayer()">⏹ Stop</button>
-          </div>
           <div style="margin-top:12px;font-size:0.8rem;color:var(--text-secondary);font-family:'Inter',sans-serif;opacity:0.6">by yz · azer.tyu199p@gmail.com</div>
       </div>`;
 
@@ -2005,7 +1897,6 @@ async function loadSurah(num, highlightAyah) {
         html += `<div class="ayah-translation">${ayah.translation}</div>`;
       }
       html += `<div class="ayah-actions">
-          <button class="ayah-play-btn" data-surah="${num}" data-ayah="${ayah.num}" onclick="playAyah(${num},${ayah.num})">🔊 Ayah ${ayah.num}</button>
           <button class="ayah-tafsir-btn" onclick="toggleAyahTafsir(${num},${ayah.num})">📖 Tafsir</button>
         </div>
         <div class="ayah-tafsir-content" id="tafsir-${num}-${ayah.num}" style="display:none"></div>
@@ -2216,7 +2107,6 @@ async function loadSurahWbw(num) {
 
       html += `</div>
         <div class="ayah-actions" style="justify-content:center;border-top:none;margin-top:4px">
-          <button class="ayah-play-btn" data-surah="${num}" data-ayah="${ayahNum}" onclick="playAyah(${num},${ayahNum})">🔊 Ayah ${ayahNum}</button>
           <button class="ayah-tafsir-btn" onclick="toggleAyahTafsir(${num},${ayahNum})">📖 Tafsir</button>
         </div>
         <div class="ayah-tafsir-content" id="tafsir-${num}-${ayahNum}" style="display:none"></div>
@@ -2258,120 +2148,8 @@ async function loadSurahWbw(num) {
 }
 
 
-// ═══════════════════════════════════════════════
-//  AUDIO PLAYER
-// ═══════════════════════════════════════════════
 
 
-function getAudioUrl(surah, ayah, reciter) {
-  return `https://everyayah.com/data/${reciter}/${String(surah).padStart(3,'0')}${String(ayah).padStart(3,'0')}.mp3`;
-}
-
-
-function playAyah(surah, ayah) {
-  if (!audioPlayer) {
-    audioPlayer = new Audio();
-    audioPlayer.addEventListener('ended', function() {
-      if (autoPlay) nextAyahAudio();
-      else updatePlayBtn();
-    });
-    audioPlayer.addEventListener('error', function() {
-      updatePlayBtn();
-    });
-  }
-  playingAyah = { surah: surah, ayah: ayah };
-  audioPlayer.src = getAudioUrl(surah, ayah, currentReciter);
-  audioPlayer.play().catch(function(e) { console.log('Audio error:', e); });
-  updatePlayBtn();
-  showAudioBar();
-  highlightAyah(surah, ayah);
-}
-
-
-function playSurahAll(surah) {
-  autoPlay = true;
-  document.getElementById('autoPlayBtn').classList.add('active');
-  playAyah(surah, 1);
-}
-
-
-function highlightAyah(surah, ayah) {
-  var id = currentSurah > 0 && document.getElementById('wbw-' + ayah) ? 'wbw-' + ayah : 'ayah-' + ayah;
-  document.querySelectorAll('.ayah-playing').forEach(function(el) { el.classList.remove('ayah-playing'); });
-  var el = document.getElementById(id);
-  if (el) {
-    el.classList.add('ayah-playing');
-    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-  }
-}
-
-
-function toggleAudioPlay() {
-  if (!audioPlayer || !playingAyah) return;
-  if (audioPlayer.paused) audioPlayer.play();
-  else audioPlayer.pause();
-  updatePlayBtn();
-}
-
-
-function nextAyahAudio() {
-  if (!playingAyah) return;
-  var s = playingAyah.surah;
-  var a = playingAyah.ayah;
-  var info = SURAHS.find(function(x) { return x.n === s; });
-  var maxAyah = info ? (s === 2 ? 286 : (s === 8 ? 75 : (s === 3 ? 200 : (s === 7 ? 206 : (s === 10 ? 109 : (s === 11 ? 123 : (s === 12 ? 111 : (s === 16 ? 128 : (s === 17 ? 111 : (s === 18 ? 110 : (s === 20 ? 135 : (s === 23 ? 118 : (s === 26 ? 227 : (s === 27 ? 93 : (s === 28 ? 88 : (s === 37 ? 182 : (s === 54 ? 55 : (s === 68 ? 52 : (s === 69 ? 52 : (s === 78 ? 40 : (s === 80 ? 42 : (s === 96 ? 19 : 0)))))))))))))))))))))) : 0;
-  if (a < maxAyah) playAyah(s, a + 1);
-}
-
-
-function prevAyahAudio() {
-  if (!playingAyah) return;
-  if (playingAyah.ayah > 1) playAyah(playingAyah.surah, playingAyah.ayah - 1);
-}
-
-
-function toggleAutoPlay() {
-  autoPlay = !autoPlay;
-  document.getElementById('autoPlayBtn').classList.toggle('active', autoPlay);
-}
-
-
-function updatePlayBtn() {
-  var btn = document.getElementById('audioBarPlayBtn');
-  if (!btn) return;
-  var paused = !audioPlayer || audioPlayer.paused;
-  btn.textContent = paused ? '▶' : '⏸';
-  document.querySelectorAll('.ayah-play-btn').forEach(function(el) {
-    el.classList.toggle('playing', playingAyah && el.dataset.surah == playingAyah.surah && el.dataset.ayah == playingAyah.ayah && !paused);
-  });
-}
-
-
-function showAudioBar() {
-  document.getElementById('audioBar').classList.add('show');
-  document.body.style.paddingBottom = '80px';
-  if (playingAyah) {
-    var info = SURAHS.find(function(x) { return x.n === playingAyah.surah; });
-    document.getElementById('audioBarName').textContent = info ? info.a : '';
-    document.getElementById('audioBarAyah').textContent = 'Ayah ' + playingAyah.ayah;
-  }
-}
-
-
-function closeAudioPlayer() {
-  if (audioPlayer) { audioPlayer.pause(); audioPlayer = null; }
-  playingAyah = null;
-  document.getElementById('audioBar').classList.remove('show');
-  document.body.style.paddingBottom = '';
-  document.querySelectorAll('.ayah-play-btn').forEach(function(el) { el.classList.remove('playing'); });
-}
-
-
-function changeReciter(reciter) {
-  currentReciter = reciter;
-  localStorage.setItem('quranReciter', reciter);
-  if (playingAyah) playAyah(playingAyah.surah, playingAyah.ayah);
-}
 
 
 // ═══════════════════════════════════════════════
