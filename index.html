@@ -821,6 +821,18 @@
       #langBtn { max-width: 70px; font-size: 0.7rem; }
       .lang-dropdown { left: 4px; min-width: 180px; }
     }
+    .ayah-block.active-ayah{background:rgba(201,168,76,0.16)!important;box-shadow:inset 3px 0 0 var(--gold);border-radius:10px}
+    .reciter-dropdown{display:none;position:fixed;top:60px;left:10px;background:#222;border:1px solid #555;border-radius:10px;z-index:9999;min-width:200px;padding:4px}
+    .reciter-dropdown.open{display:block}
+    .reciter-dropdown .reciter-item{padding:10px 14px;cursor:pointer;color:#ddd;border-radius:6px;font-size:.9rem;direction:rtl;text-align:right}
+    .reciter-dropdown .reciter-item:hover,.reciter-dropdown .reciter-item.selected{background:var(--primary);color:#fff}
+    .audio-player-bar{position:fixed;bottom:0;left:0;right:0;z-index:1000;background:var(--primary-dark);color:#fff;padding:8px 12px calc(8px + env(safe-area-inset-bottom));transform:translateY(100%);transition:transform .3s;font-family:'Inter',sans-serif}
+    .audio-player-bar.show{transform:translateY(0)}
+    .apb-info{font-size:.78rem;text-align:center;opacity:.85;margin-bottom:6px}
+    .apb-controls{display:flex;align-items:center;justify-content:center;gap:18px}
+    .apb-btn{background:none;border:none;color:#fff;font-size:1.3rem;cursor:pointer;padding:6px 10px}
+    .apb-btn.play{font-size:1.7rem}
+    .apb-speed{font-size:.75rem;border:1px solid rgba(255,255,255,.4);border-radius:8px;padding:3px 8px;cursor:pointer;background:none;color:#fff}
   </style>
     <!-- Cloudflare Web Analytics --><script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "a30fd89985dc4555b08862b0d83bb975"}'></script><!-- End Cloudflare Web Analytics -->
 </head>
@@ -921,6 +933,8 @@
 <!-- HEADER -->
 <header>
   <button class="wby-toggle" id="wbyToggle" onclick="toggleWordByWord()" title="Mot à mot">📖 Mot à mot</button>
+  <button class="btn" id="reciterBtn" onclick="toggleReciterDropdown()" title="Récitateur">🎧</button>
+  <div class="reciter-dropdown" id="reciterDropdown"></div>
   <button class="btn" id="themeBtn" onclick="toggleTheme()" title="Toggle theme">🌙</button>
   <div id="langBtn" tabindex="0" role="button" aria-haspopup="listbox" onclick="toggleLangDropdown()">🇺🇸 English</div>
   <div class="lang-dropdown" id="langDropdown" role="listbox"></div>
@@ -931,6 +945,16 @@
 
 
 <div class="offline-banner" id="offlineBanner">⚠️ You are offline — showing cached data</div>
+<div class="audio-player-bar" id="audioPlayerBar">
+  <div class="apb-info" id="apbInfo">—</div>
+  <div class="apb-controls">
+    <button class="apb-btn" onclick="playPrevAyah()">⏮</button>
+    <button class="apb-btn play" id="apbPlayBtn" onclick="toggleAudioPlayback()">⏸</button>
+    <button class="apb-btn" onclick="playNextAyah()">⏭</button>
+    <button class="apb-speed" id="apbSpeed" onclick="cycleSpeed()">1.0x</button>
+    <button class="apb-btn" onclick="closeAudioPlayer()">✕</button>
+  </div>
+</div>
 
 
 <!-- SIDEBAR -->
@@ -1251,7 +1275,7 @@ let currentSurah = 0;
 let fontSize = 1.8;
 let transSize = 0.95;
 let currentLang = localStorage.getItem('quranLang') || 'en.sahih';
-let currentReciter = localStorage.getItem('quranReciter') || 'ar.alafasy';
+let currentReciter = localStorage.getItem('quranReciter') || 'ar.muaiqly';
 let touchStartDist = 0;
 let quranData = null;
 
@@ -1962,6 +1986,7 @@ async function loadSurah(num, highlightAyah) {
         html += `<div class="ayah-translation">${ayah.translation}</div>`;
       }
       html += `<div class="ayah-actions">
+          <button class="ayah-tafsir-btn" onclick="playFromAyah(${num},${ayah.num})">▶️</button>
           <button class="ayah-tafsir-btn" onclick="toggleAyahTafsir(${num},${ayah.num})">📖 Tafsir</button>
         </div>
         <div class="ayah-tafsir-content" id="tafsir-${num}-${ayah.num}" style="display:none"></div>
@@ -2385,6 +2410,85 @@ loadSurah = function(num, highlightAyah, forceNormal) {
     _origLoadSurah(num, highlightAyah);
   }
 };
+
+
+const RECITERS=[{key:'husr',label:'الحصري'},{key:'shur',label:'الشريم'},{key:'ajm',label:'العجمي'},{key:'maher',label:'المعيقلي'},{key:'minsh',label:'المنشاوي'}];
+const RECITER_MATCH={husr:['husary','hussary'],shur:['shuraym','shuraim'],ajm:['ajamy','ajmy','ajmi'],maher:['muaiqly','moaiqly'],minsh:['minshawi']};
+const RECITER_FALLBACK={husr:'ar.husary',shur:'ar.shuraim',ajm:'ar.ahmedajamy',maher:'ar.mahermuaiqly',minsh:'ar.minshawi'};
+let selectedReciter=localStorage.getItem('selectedReciter')||'maher';
+let reciterIds=null;
+async function resolveReciterIds(){
+  if(reciterIds)return reciterIds;
+  const cached=localStorage.getItem('reciterIdsV1');
+  if(cached){reciterIds=JSON.parse(cached);return reciterIds;}
+  try{
+    const res=await fetch('https://api.alquran.cloud/v1/edition?format=audio&language=ar');
+    const data=await res.json();const editions=data.data||[];const ids={};
+    for(const key in RECITER_MATCH){
+      const found=editions.find(e=>RECITER_MATCH[key].some(n=>e.identifier.toLowerCase().includes(n)||(e.englishName||'').toLowerCase().includes(n)));
+      ids[key]=found?found.identifier:RECITER_FALLBACK[key];
+    }
+    reciterIds=ids;localStorage.setItem('reciterIdsV1',JSON.stringify(ids));
+  }catch(e){reciterIds=RECITER_FALLBACK;}
+  return reciterIds;
+}
+function populateReciterDropdown(){
+  const dd=document.getElementById('reciterDropdown');dd.innerHTML='';
+  RECITERS.forEach(r=>{
+    const item=document.createElement('div');
+    item.className='reciter-item'+(r.key===selectedReciter?' selected':'');
+    item.textContent=r.label;
+    item.onclick=()=>{selectedReciter=r.key;localStorage.setItem('selectedReciter',r.key);populateReciterDropdown();closeReciterDropdown();if(isPlaying)playAyah(playIndex);};
+    dd.appendChild(item);
+  });
+}
+function toggleReciterDropdown(){const dd=document.getElementById('reciterDropdown');dd.classList.contains('open')?closeReciterDropdown():(populateReciterDropdown(),dd.classList.add('open'));}
+function closeReciterDropdown(){document.getElementById('reciterDropdown').classList.remove('open');}
+document.addEventListener('click',e=>{if(!e.target.closest('#reciterBtn')&&!e.target.closest('#reciterDropdown'))closeReciterDropdown();});
+
+
+let playQueue=[],playIndex=-1,isPlaying=false;
+let playerAudio=new Audio(),preloadAudio=new Audio();
+let playbackSpeeds=[0.75,1.0,1.25],speedIndex=1;
+
+
+function buildPlayQueue(){playQueue=Array.from(document.querySelectorAll('.ayah-block')).map(b=>({surah:currentSurah,ayah:parseInt(b.id.split('-')[1]),elId:b.id}));}
+function playFromAyah(surahNum,ayahNum){buildPlayQueue();const idx=playQueue.findIndex(q=>q.ayah===ayahNum);playAyah(idx>=0?idx:0);}
+async function playAyah(index){
+  if(index<0||index>=playQueue.length){stopAudioPlayback();return;}
+  playIndex=index;const{surah,ayah,elId}=playQueue[index];
+  document.getElementById('audioPlayerBar').classList.add('show');
+  document.getElementById('apbInfo').textContent='آية '+ayah;
+  const ids=await resolveReciterIds();const reciterId=ids[selectedReciter];
+  try{
+    const res=await fetch(`https://api.alquran.cloud/v1/ayah/${surah}:${ayah}/${reciterId}`);
+    const data=await res.json();
+    playerAudio.src=data.data.audio;playerAudio.playbackRate=playbackSpeeds[speedIndex];
+    await playerAudio.play();isPlaying=true;
+    document.getElementById('apbPlayBtn').textContent='⏸';
+    highlightActiveAyah(elId);preloadNextAyah(index+1,reciterId);
+  }catch(e){playAyah(index+1);}
+}
+async function preloadNextAyah(index,reciterId){
+  if(index>=playQueue.length)return;const{surah,ayah}=playQueue[index];
+  try{const res=await fetch(`https://api.alquran.cloud/v1/ayah/${surah}:${ayah}/${reciterId}`);const data=await res.json();preloadAudio.src=data.data.audio;preloadAudio.load();}catch(e){}
+}
+function highlightActiveAyah(elId){
+  document.querySelectorAll('.ayah-block.active-ayah').forEach(el=>el.classList.remove('active-ayah'));
+  const el=document.getElementById(elId);
+  if(el){el.classList.add('active-ayah');el.scrollIntoView({behavior:'smooth',block:'center'});}
+}
+playerAudio.addEventListener('ended',()=>playAyah(playIndex+1));
+function toggleAudioPlayback(){
+  if(!playerAudio.src)return;
+  if(isPlaying){playerAudio.pause();isPlaying=false;document.getElementById('apbPlayBtn').textContent='▶️';}
+  else{playerAudio.play();isPlaying=true;document.getElementById('apbPlayBtn').textContent='⏸';}
+}
+function playNextAyah(){playAyah(playIndex+1);}
+function playPrevAyah(){playAyah(playIndex-1);}
+function stopAudioPlayback(){playerAudio.pause();isPlaying=false;document.querySelectorAll('.ayah-block.active-ayah').forEach(el=>el.classList.remove('active-ayah'));}
+function closeAudioPlayer(){stopAudioPlayback();document.getElementById('audioPlayerBar').classList.remove('show');}
+function cycleSpeed(){speedIndex=(speedIndex+1)%playbackSpeeds.length;playerAudio.playbackRate=playbackSpeeds[speedIndex];document.getElementById('apbSpeed').textContent=playbackSpeeds[speedIndex]+'x';}
 
 
 // ═══════════════════════════════════════════════
