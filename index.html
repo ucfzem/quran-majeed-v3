@@ -838,7 +838,9 @@
     .audio-player-bar{position:fixed;bottom:0;left:0;right:0;z-index:1000;background:var(--primary-dark);color:#fff;padding:8px 12px calc(8px + env(safe-area-inset-bottom));transform:translateY(100%);transition:transform .3s;font-family:'Inter',sans-serif}
     .audio-player-bar.show{transform:translateY(0)}
     .apb-info{font-size:.78rem;text-align:center;opacity:.85;margin-bottom:6px}
-    .apb-controls{display:flex;align-items:center;justify-content:center;gap:18px}
+    .apb-progress-wrap{width:100%;height:6px;background:rgba(255,255,255,.15);border-radius:3px;margin-bottom:8px;cursor:pointer}
+    .apb-progress{height:100%;background:var(--gold);border-radius:3px;transition:width .3s;width:0%}
+    .apb-controls{display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap}
     .apb-btn{background:none;border:none;color:#fff;font-size:1.3rem;cursor:pointer;padding:6px 10px}
     .apb-btn.play{font-size:1.7rem}
     .apb-speed{font-size:.75rem;border:1px solid rgba(255,255,255,.4);border-radius:8px;padding:3px 8px;cursor:pointer;background:none;color:#fff}
@@ -956,10 +958,15 @@
 <div class="offline-banner" id="offlineBanner">⚠️ You are offline — showing cached data</div>
 <div class="audio-player-bar" id="audioPlayerBar">
   <div class="apb-info" id="apbInfo">—</div>
+  <div class="apb-progress-wrap" onclick="seekAyah(event)">
+    <div class="apb-progress" id="apbProgress"></div>
+  </div>
   <div class="apb-controls">
-    <button class="apb-btn" onclick="playPrevAyah()">⏮</button>
+    <button class="apb-btn" onclick="skipAyahs(-5)" title="-5">⏪</button>
+    <button class="apb-btn" onclick="playPrevAyah()" title="Précédent">⏮</button>
     <button class="apb-btn play" id="apbPlayBtn" onclick="toggleAudioPlayback()">⏸</button>
-    <button class="apb-btn" onclick="playNextAyah()">⏭</button>
+    <button class="apb-btn" onclick="playNextAyah()" title="Suivant">⏭</button>
+    <button class="apb-btn" onclick="skipAyahs(5)" title="+5">⏩</button>
     <button class="apb-speed" id="apbSpeed" onclick="cycleSpeed()">1.0x</button>
     <button class="apb-btn" onclick="closeAudioPlayer()">✕</button>
   </div>
@@ -2322,11 +2329,15 @@ let playbackSpeeds=[0.75,1.0,1.25],speedIndex=1;
 
 function buildPlayQueue(){playQueue=Array.from(document.querySelectorAll('.ayah-block')).map(b=>({surah:currentSurah,ayah:parseInt(b.id.split('-')[1]),elId:b.id}));}
 function playFromAyah(surahNum,ayahNum){buildPlayQueue();const idx=playQueue.findIndex(q=>q.ayah===ayahNum);playAyah(idx>=0?idx:0);}
+function skipAyahs(n){const next=playIndex+n;if(next>=0&&next<playQueue.length)playAyah(next);}
+function seekAyah(e){if(!playQueue.length)return;const wrap=e.currentTarget;const pct=(e.clientX-wrap.getBoundingClientRect().left)/wrap.offsetWidth;const idx=Math.round(pct*(playQueue.length-1));if(idx>=0&&idx<playQueue.length)playAyah(idx);}
+function updateProgress(){if(!playQueue.length)return;const pct=((playIndex+1)/playQueue.length)*100;document.getElementById('apbProgress').style.width=pct+'%';}
 async function playAyah(index){
   if(index<0||index>=playQueue.length){stopAudioPlayback();return;}
   playIndex=index;const{surah,ayah,elId}=playQueue[index];
   document.getElementById('audioPlayerBar').classList.add('show');
-  document.getElementById('apbInfo').textContent='آية '+ayah;
+  document.getElementById('apbInfo').textContent='آية '+ayah+' / '+playQueue.length;
+  updateProgress();
   const ids=await resolveReciterIds();const reciterId=ids[selectedReciter];
   if(ayah===1&&surah!==9){
     playingBismillah=true;
@@ -2336,6 +2347,7 @@ async function playAyah(index){
       playerAudio.src=data.data.audio;playerAudio.playbackRate=playbackSpeeds[speedIndex];
       await playerAudio.play();isPlaying=true;
       document.getElementById('apbPlayBtn').textContent='⏸';
+      document.getElementById('apbInfo').textContent='بسم الله — آية 1 / '+playQueue.length;
       highlightActiveAyah(elId);
       return;
     }catch(e){}
