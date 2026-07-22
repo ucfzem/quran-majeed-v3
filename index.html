@@ -964,7 +964,7 @@
   <p style="margin-top:8px;opacity:0.6">Créé avec ❤️ | <a href="https://ucfzem.github.io/quran-majeed-v3/" style="color:var(--gold);text-decoration:none">Quran Majeed</a> | <a href="https://ucfzem.github.io/liens/" style="color:var(--gold);text-decoration:none">Mes projets</a></p>
 </footer>
 
-<audio id="audioPlayer" ontimeupdate="updateProgress()" onended="audioEnded()"></audio>
+<audio id="audioPlayer" onended="audioEnded()"></audio>
 
 
 <script>
@@ -1998,7 +1998,8 @@ async function loadSurah(num, highlightAyah) {
       el.classList.toggle('active', parseInt(el.dataset.num) === num);
     });
 
-    setupAudio(num);
+    currentAyah = 0;
+    highlightAyah(0);
 
 
   } catch (err) {
@@ -2195,10 +2196,12 @@ async function loadSurahWbw(num) {
 
 
 
-
 // ═══════════════════════════════════════════════
 //  AUDIO
 // ═══════════════════════════════════════════════
+
+
+var currentAyah = 0;
 
 
 function getReciterFolder(reciterCode) {
@@ -2213,19 +2216,41 @@ function getReciterFolder(reciterCode) {
 }
 
 
-function setupAudio(surahNum) {
+function getAyahUrl(surah, ayah) {
+  var folder = getReciterFolder(currentReciter);
+  var ss = String(surah).padStart(3, '0');
+  var aa = String(ayah).padStart(3, '0');
+  return 'https://everyayah.com/data/' + folder + '/' + ss + aa + '.mp3';
+}
+
+
+function highlightAyah(ayah) {
+  document.querySelectorAll('.ayah-block').forEach(function(el) { el.classList.remove('playing'); });
+  var el = document.getElementById('ayah-' + ayah);
+  if (el) el.classList.add('playing');
+}
+
+
+function loadAyah(surah, ayah) {
   var audio = document.getElementById('audioPlayer');
-  var padNum = String(surahNum).padStart(3, '0');
-  audio.src = 'https://everyayah.com/data/' + getReciterFolder(currentReciter) + '/' + padNum + '.mp3';
+  currentAyah = ayah;
+  audio.src = getAyahUrl(surah, ayah);
   audio.load();
+  audio.play();
+  highlightAyah(ayah);
   var btn = document.getElementById('playPauseBtn');
-  if (btn) btn.textContent = '▶ ' + (getUI('play') || 'Play');
+  if (btn) btn.textContent = '⏸ ' + (getUI('pause') || 'Pause');
 }
 
 
 function togglePlayPause() {
   var audio = document.getElementById('audioPlayer');
   var btn = document.getElementById('playPauseBtn');
+  if (!currentSurah) return;
+  if (!audio.src || currentAyah === 0) {
+    loadAyah(currentSurah, 1);
+    return;
+  }
   if (audio.paused) {
     audio.play();
     if (btn) btn.textContent = '⏸ ' + (getUI('pause') || 'Pause');
@@ -2237,30 +2262,22 @@ function togglePlayPause() {
 
 
 function playAyah(surah, ayahNum) {
-  var audio = document.getElementById('audioPlayer');
-  var surahObj = SURAHS.find(function(s) { return s.n === surah; });
-  if (audio.duration && surahObj) {
-    var perAyah = audio.duration / surahObj.ayahs;
-    audio.currentTime = (ayahNum - 1) * perAyah;
-    audio.play();
-    var btn = document.getElementById('playPauseBtn');
-    if (btn) btn.textContent = '⏸ ' + (getUI('pause') || 'Pause');
-  }
+  if (surah !== currentSurah) return;
+  loadAyah(surah, ayahNum);
 }
 
 
-function updateProgress() {
-  var audio = document.getElementById('audioPlayer');
-  if (!isNaN(audio.duration) && audio.duration > 0) {
-    var surahObj = SURAHS.find(function(s) { return s.n === currentSurah; });
-    if (surahObj) {
-      var perAyah = audio.duration / surahObj.ayahs;
-      var active = Math.floor(audio.currentTime / perAyah) + 1;
-      if (active > surahObj.ayahs) active = surahObj.ayahs;
-      document.querySelectorAll('.ayah-block').forEach(function(el) { el.classList.remove('playing'); });
-      var activeEl = document.getElementById('ayah-' + active);
-      if (activeEl) activeEl.classList.add('playing');
-    }
+function nextAyah() {
+  if (!currentSurah || !currentAyah) return;
+  var surahObj = SURAHS.find(function(s) { return s.n === currentSurah; });
+  if (!surahObj) return;
+  if (currentAyah < surahObj.ayahs) {
+    loadAyah(currentSurah, currentAyah + 1);
+  } else {
+    currentAyah = 0;
+    highlightAyah(0);
+    var btn = document.getElementById('playPauseBtn');
+    if (btn) btn.textContent = '▶ ' + (getUI('play') || 'Play');
   }
 }
 
@@ -2268,19 +2285,19 @@ function updateProgress() {
 function changeReciter(code) {
   currentReciter = code;
   localStorage.setItem('quranReciter', code);
-  if (currentSurah) {
-    setupAudio(currentSurah);
-    document.getElementById('audioPlayer').play();
+  if (currentSurah && currentAyah > 0) {
+    loadAyah(currentSurah, currentAyah);
+  } else if (currentSurah) {
+    var audio = document.getElementById('audioPlayer');
     var btn = document.getElementById('playPauseBtn');
-    if (btn) btn.textContent = '⏸ ' + (getUI('pause') || 'Pause');
+    audio.src = '';
+    if (btn) btn.textContent = '▶ ' + (getUI('play') || 'Play');
   }
 }
 
 
 function audioEnded() {
-  var btn = document.getElementById('playPauseBtn');
-  if (btn) btn.textContent = '▶ ' + (getUI('play') || 'Play');
-  document.querySelectorAll('.ayah-block').forEach(function(el) { el.classList.remove('playing'); });
+  nextAyah();
 }
 
 
