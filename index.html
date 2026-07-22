@@ -2330,6 +2330,22 @@ let continuousMode=localStorage.getItem('continuousMode')==='1';
 let playerAudio=new Audio(),preloadAudio=new Audio();
 let playbackSpeeds=[0.75,1.0,1.25],speedIndex=1;
 
+if('mediaSession' in navigator){
+  navigator.mediaSession.setActionHandler('play',()=>toggleAudioPlayback());
+  navigator.mediaSession.setActionHandler('pause',()=>toggleAudioPlayback());
+  navigator.mediaSession.setActionHandler('previoustrack',()=>playPrevAyah());
+  navigator.mediaSession.setActionHandler('nexttrack',()=>playNextAyah());
+}
+function updateMediaSession(ayahNum){
+  if(!('mediaSession' in navigator))return;
+  const surah=SURAHS.find(s=>s.n===currentSurah);
+  navigator.mediaSession.metadata=new MediaMetadata({
+    title:'آية '+ayahNum+(surah?' — '+surah.a:''),
+    artist:'القرآن الكريم',
+    album:'Quran Majeed',
+  });
+}
+
 
 function buildPlayQueue(){playQueue=Array.from(document.querySelectorAll('.ayah-block')).map(b=>({surah:currentSurah,ayah:parseInt(b.id.split('-')[1]),elId:b.id}));}
 function playFromAyah(surahNum,ayahNum){buildPlayQueue();const idx=playQueue.findIndex(q=>q.ayah===ayahNum);playAyah(idx>=0?idx:0);}
@@ -2363,7 +2379,7 @@ async function playAyah(index){
     playerAudio.src=data.data.audio;playerAudio.playbackRate=playbackSpeeds[speedIndex];
     await playerAudio.play();isPlaying=true;
     document.getElementById('apbPlayBtn').textContent='⏸';
-    highlightActiveAyah(elId);preloadNextAyah(index+1,reciterId);
+    highlightActiveAyah(elId);preloadNextAyah(index+1,reciterId);updateMediaSession(ayah);
   }catch(e){playAyah(index+1);}
 }
 async function preloadNextAyah(index,reciterId){
