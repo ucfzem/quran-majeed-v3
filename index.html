@@ -2359,8 +2359,21 @@ function highlightActiveAyah(elId){
   const el=document.getElementById(elId);
   if(el){el.classList.add('active-ayah');el.scrollIntoView({behavior:'smooth',block:'center'});}
 }
-playerAudio.addEventListener('ended',()=>{
-  if(playingBismillah){playingBismillah=false;playAyah(playIndex);return;}
+playerAudio.addEventListener('ended',async()=>{
+  if(playingBismillah){
+    playingBismillah=false;
+    const{surah,ayah,elId}=playQueue[playIndex];
+    const ids=await resolveReciterIds();const reciterId=ids[selectedReciter];
+    try{
+      const res=await fetch(`https://api.alquran.cloud/v1/ayah/${surah}:${ayah}/${reciterId}`);
+      const data=await res.json();
+      playerAudio.src=data.data.audio;playerAudio.playbackRate=playbackSpeeds[speedIndex];
+      await playerAudio.play();
+      document.getElementById('apbPlayBtn').textContent='⏸';
+      highlightActiveAyah(elId);preloadNextAyah(playIndex+1,reciterId);
+    }catch(e){playAyah(playIndex+1);}
+    return;
+  }
   playAyah(playIndex+1);
 });
 function toggleAudioPlayback(){
