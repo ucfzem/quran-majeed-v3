@@ -2359,7 +2359,7 @@ async function playAyah(index){
   document.getElementById('apbInfo').textContent='آية '+ayah+' / '+playQueue.length;
   updateProgress();
   const ids=await resolveReciterIds();const reciterId=ids[selectedReciter];
-  if(ayah===1&&surah!==9){
+  if(ayah===1&&surah!==9&&surah!==1){
     playingBismillah=true;
     try{
       const res=await fetch(`https://api.alquran.cloud/v1/ayah/1:1/${reciterId}`);
