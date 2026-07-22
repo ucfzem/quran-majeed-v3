@@ -2315,7 +2315,7 @@ function closeReciterDropdown(){document.getElementById('reciterDropdown').class
 document.addEventListener('click',e=>{if(!e.target.closest('#reciterBtn')&&!e.target.closest('#reciterDropdown'))closeReciterDropdown();});
 
 
-let playQueue=[],playIndex=-1,isPlaying=false;
+let playQueue=[],playIndex=-1,isPlaying=false,playingBismillah=false;
 let playerAudio=new Audio(),preloadAudio=new Audio();
 let playbackSpeeds=[0.75,1.0,1.25],speedIndex=1;
 
@@ -2328,6 +2328,19 @@ async function playAyah(index){
   document.getElementById('audioPlayerBar').classList.add('show');
   document.getElementById('apbInfo').textContent='آية '+ayah;
   const ids=await resolveReciterIds();const reciterId=ids[selectedReciter];
+  if(ayah===1&&surah!==9){
+    playingBismillah=true;
+    try{
+      const res=await fetch(`https://api.alquran.cloud/v1/ayah/1:1/${reciterId}`);
+      const data=await res.json();
+      playerAudio.src=data.data.audio;playerAudio.playbackRate=playbackSpeeds[speedIndex];
+      await playerAudio.play();isPlaying=true;
+      document.getElementById('apbPlayBtn').textContent='⏸';
+      highlightActiveAyah(elId);
+      return;
+    }catch(e){}
+  }
+  playingBismillah=false;
   try{
     const res=await fetch(`https://api.alquran.cloud/v1/ayah/${surah}:${ayah}/${reciterId}`);
     const data=await res.json();
@@ -2346,7 +2359,10 @@ function highlightActiveAyah(elId){
   const el=document.getElementById(elId);
   if(el){el.classList.add('active-ayah');el.scrollIntoView({behavior:'smooth',block:'center'});}
 }
-playerAudio.addEventListener('ended',()=>playAyah(playIndex+1));
+playerAudio.addEventListener('ended',()=>{
+  if(playingBismillah){playingBismillah=false;playAyah(playIndex);return;}
+  playAyah(playIndex+1);
+});
 function toggleAudioPlayback(){
   if(!playerAudio.src)return;
   if(isPlaying){playerAudio.pause();isPlaying=false;document.getElementById('apbPlayBtn').textContent='▶️';}
@@ -2354,7 +2370,7 @@ function toggleAudioPlayback(){
 }
 function playNextAyah(){playAyah(playIndex+1);}
 function playPrevAyah(){playAyah(playIndex-1);}
-function stopAudioPlayback(){playerAudio.pause();isPlaying=false;document.querySelectorAll('.ayah-block.active-ayah').forEach(el=>el.classList.remove('active-ayah'));}
+function stopAudioPlayback(){playerAudio.pause();isPlaying=false;playingBismillah=false;document.querySelectorAll('.ayah-block.active-ayah').forEach(el=>el.classList.remove('active-ayah'));}
 function closeAudioPlayer(){stopAudioPlayback();document.getElementById('audioPlayerBar').classList.remove('show');}
 function cycleSpeed(){speedIndex=(speedIndex+1)%playbackSpeeds.length;playerAudio.playbackRate=playbackSpeeds[speedIndex];document.getElementById('apbSpeed').textContent=playbackSpeeds[speedIndex]+'x';}
 
