@@ -521,6 +521,7 @@
     .ayah-block {
       margin-bottom: 18px; padding: 12px 14px;
       border-radius: 10px; transition: background 0.2s;
+      cursor: pointer;
     }
     .ayah-block:hover { background: rgba(0,105,92,0.04); }
     body.dark .ayah-block:hover { background: rgba(255,255,255,0.03); }
@@ -1983,14 +1984,14 @@ async function loadSurah(num, scrollToAyah) {
 
 
     ayahs.forEach(ayah => {
-      html += `<div class="ayah-block" id="ayah-${ayah.num}">
-        <div class="ayah-arabic">${ayah.arabic} <span class="ayah-num" onclick="playFromAyah(${num},${ayah.num})">${ayah.num}</span></div>`;
+      html += `<div class="ayah-block" id="ayah-${ayah.num}" onclick="playFromAyah(${num},${ayah.num})">
+        <div class="ayah-arabic">${ayah.arabic} <span class="ayah-num" onclick="event.stopPropagation();playFromAyah(${num},${ayah.num})">${ayah.num}</span></div>`;
       if (ayah.translation) {
         html += `<div class="ayah-translation">${ayah.translation}</div>`;
       }
       html += `<div class="ayah-actions">
-          <button class="ayah-tafsir-btn" onclick="playFromAyah(${num},${ayah.num})">▶️</button>
-          <button class="ayah-tafsir-btn" onclick="toggleAyahTafsir(${num},${ayah.num})">📖 Tafsir</button>
+          <button class="ayah-tafsir-btn" onclick="event.stopPropagation();playFromAyah(${num},${ayah.num})">▶️</button>
+          <button class="ayah-tafsir-btn" onclick="event.stopPropagation();toggleAyahTafsir(${num},${ayah.num})">📖 Tafsir</button>
         </div>
         <div class="ayah-tafsir-content" id="tafsir-${num}-${ayah.num}" style="display:none"></div>
       </div>`;
@@ -2198,7 +2199,7 @@ async function loadSurahWbw(num) {
 
       html += `</div>
         <div class="ayah-actions" style="justify-content:center;border-top:none;margin-top:4px">
-          <button class="ayah-tafsir-btn" onclick="toggleAyahTafsir(${num},${ayahNum})">📖 Tafsir</button>
+          <button class="ayah-tafsir-btn" onclick="event.stopPropagation();toggleAyahTafsir(${num},${ayahNum})">📖 Tafsir</button>
         </div>
         <div class="ayah-tafsir-content" id="tafsir-${num}-${ayahNum}" style="display:none"></div>
       </div>`;
