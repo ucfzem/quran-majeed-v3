@@ -2339,6 +2339,29 @@ async function releaseWakeLock(){
 document.addEventListener('visibilitychange',()=>{
   if(!document.hidden&&isPlaying)requestWakeLock();
 });
+// NoSleep.js — hidden video keeps device awake (works in all browsers)
+let noSleepVideo=null;
+function startNoSleep(){
+  if(noSleepVideo)return;
+  noSleepVideo=document.createElement('video');
+  noSleepVideo.setAttribute('playsinline','');
+  noSleepVideo.setAttribute('loop','');
+  noSleepVideo.setAttribute('muted','');
+  noSleepVideo.style.cssText='position:fixed;left:-100vw;width:1px;height:1px;pointer-events:none;opacity:0';
+  document.body.appendChild(noSleepVideo);
+  noSleepVideo.src='data:video/mp4;base64,AAAAIGZ0eXBpc29tAAACAGlzb21pc28yYXZjMW1wNDEAAAAIZnJlZQAAAAhtZGF0AAAA'+
+    'Cm1vb3YAAABsbXZoZAAAAAAAAAAAAAAAAAAAA+gAAAfQAAEAAAEAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAA'+
+    'AQAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIAAAx0cmFzAAAAXGlzb2Nvb2Rl'+
+    'Y3J4AAAACmRhdGEAAAAAAAABAAAAPAAAAAAA';
+  noSleepVideo.load();
+  noSleepVideo.play().catch(()=>{});
+}
+function stopNoSleep(){
+  if(!noSleepVideo)return;
+  try{noSleepVideo.pause();noSleepVideo.src='';noSleepVideo.load();}catch(e){}
+  try{document.body.removeChild(noSleepVideo);}catch(e){}
+  noSleepVideo=null;
+}
 
 if('mediaSession' in navigator){
   navigator.mediaSession.setActionHandler('play',()=>toggleAudioPlayback());
@@ -2378,7 +2401,7 @@ async function playAyah(index){
       await playerAudio.play();isPlaying=true;
       document.getElementById('apbPlayBtn').textContent='⏸';
       document.getElementById('apbInfo').textContent='بسم الله — آية 1 / '+playQueue.length;
-      highlightActiveAyah(elId);
+      highlightActiveAyah(elId);startNoSleep();
       return;
     }catch(e){}
   }
@@ -2389,7 +2412,7 @@ async function playAyah(index){
     playerAudio.src=data.data.audio;playerAudio.playbackRate=playbackSpeeds[speedIndex];
     await playerAudio.play();isPlaying=true;
     document.getElementById('apbPlayBtn').textContent='⏸';
-    highlightActiveAyah(elId);preloadNextAyah(index+1,reciterId);updateMediaSession(ayah);requestWakeLock();
+    highlightActiveAyah(elId);preloadNextAyah(index+1,reciterId);updateMediaSession(ayah);requestWakeLock();startNoSleep();
   }catch(e){playAyah(index+1);}
 }
 async function preloadNextAyah(index,reciterId){
@@ -2439,7 +2462,7 @@ function stopAudioPlayback(){
   document.querySelectorAll('.ayah-block.active-ayah').forEach(el=>el.classList.remove('active-ayah'));
   try{if(bgOsc){bgOsc.stop();bgOsc.disconnect();bgOsc=null;}}catch(e){}
   try{if(bgAudioCtx){bgAudioCtx.close();bgAudioCtx=null;}}catch(e){}
-  releaseWakeLock();
+  releaseWakeLock();stopNoSleep();
 }
 function closeAudioPlayer(){stopAudioPlayback();document.getElementById('audioPlayerBar').classList.remove('show');}
 function cycleSpeed(){speedIndex=(speedIndex+1)%playbackSpeeds.length;playerAudio.playbackRate=playbackSpeeds[speedIndex];document.getElementById('apbSpeed').textContent=playbackSpeeds[speedIndex]+'x';}
