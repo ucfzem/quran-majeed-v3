@@ -1,46 +1,33 @@
-# Conversation Backup — 2026-07-22 (Session 2)
+# Conversation Backup — 2026-07-23 (Session 3)
 
 ## Changes Made
 
-### 1. Brown-Gold Dark Theme
-- Replaced dark gray/blue theme with brown (#24160d) and gold (#d4af37)
-- Verse number circles: bright gold gradient (#fff8e1 → #e6c687 → #d4af37)
+### 1. Screen Wake Lock API
+- Added `navigator.wakeLock.request('screen')` when audio plays
+- Prevents screen from dimming/turning off during playback
+- Automatically releases when audio stops
+- Re-acquires wake lock on page visibility change if still playing
 
-### 2. Bismillah Audio
-- Plays بسم الله الرحمن الرحيم before ayah 1 of every surah
-- Except At-Tawbah (surah 9) which has no Bismillah
-- Shows "بسم الله — آية 1 / X" in player bar
+### 2. Background Audio Keep-Alive
+- Periodic 5-second interval to resume AudioContext when hidden
+- Prevents browser suspension of background audio on Android/iOS
+- Complements existing oscillator hack for iOS Safari
 
-### 3. Audio Player Improvements
-- **Progress bar** (clickable to seek)
-- **Skip ±5 ayahs** buttons (⏪/⏩)
-- **Ayah counter** (آية X / total)
-- **Tap anywhere** on verse to play (not just the number)
+### 3. Conversation Backup
+- This file updated for Session 3
 
-### 4. Continuous Mode (🔁)
-- Toggle button in player bar
-- When enabled, auto-plays next surah after current one finishes
-- Saves preference to localStorage
-
-### 5. Media Session API
-- Background/lock-screen playback
-- Shows surah name + ayah in notification
-- Play/pause/prev/next controls in lock screen
-
-### 6. Bug Fixes
-- Removed old mp3quran.net audio module
-- Fixed highlightAyah parameter/function naming conflict
-- Fixed Bismillah infinite loop
-- Fixed audio not stopping when switching surah
-- Fixed sw.js blocking API calls
-
-### 7. Deployments
+### 4. Deployments
+- GitHub Pages (auto): https://ucfzem.github.io/quran-majeed-v3/
 - Vercel: https://quran-majeed-v3.vercel.app
 - Cloudflare Workers: https://quran-majeed.azer-tyu199p.workers.dev
-- GitHub Pages: https://ucfzem.github.io/quran-majeed-v3/
 
 ## Git Log
 ```
+c9e308e feat: Wake Lock API + background audio keep-alive for screen-off playback
+a358e44 docs: conversation backup session 3
+3681586 fix: skip pre-Bismillah for Al-Fatihah (ayah 1 IS the Bismillah)
+b57b5e3 fix: continuous mode - add error handling + DOM delay
+5c54a01 docs: conversation backup session 2
 808cec1 feat: Media Session API for background/lock-screen playback
 e16456d feat: continuous mode + remove unused audio tag
 23f3d56 fix: enable workers_dev in wrangler.toml
@@ -61,3 +48,5 @@ e765741 fix: remove old audio module, fix highlightAyah conflict
 - **Reciters**: الحصري، الشريم، العجمي، المعيقلي، المنشاوي (auto-resolved)
 - **Media Session**: Background playback + lock screen controls
 - **Continuous Mode**: Auto-advances to next surah (localStorage)
+- **Wake Lock**: `navigator.wakeLock.request('screen')` prevents screen sleep
+- **Keep-Alive**: 5s interval resumes AudioContext when hidden
