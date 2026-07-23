@@ -2329,6 +2329,16 @@ let playQueue=[],playIndex=-1,isPlaying=false,playingBismillah=false;
 let continuousMode=localStorage.getItem('continuousMode')==='1';
 let playerAudio=new Audio(),preloadAudio=new Audio();
 let playbackSpeeds=[0.75,1.0,1.25],speedIndex=1;
+let wakeLock=null;
+async function requestWakeLock(){
+  try{if('wakeLock'in navigator&&!wakeLock){wakeLock=await navigator.wakeLock.request('screen');wakeLock.addEventListener('release',()=>{wakeLock=null;});}}catch(e){}
+}
+async function releaseWakeLock(){
+  try{if(wakeLock){await wakeLock.release();wakeLock=null;}}catch(e){}
+}
+document.addEventListener('visibilitychange',()=>{
+  if(!document.hidden&&isPlaying)requestWakeLock();
+});
 
 if('mediaSession' in navigator){
   navigator.mediaSession.setActionHandler('play',()=>toggleAudioPlayback());
@@ -2379,7 +2389,7 @@ async function playAyah(index){
     playerAudio.src=data.data.audio;playerAudio.playbackRate=playbackSpeeds[speedIndex];
     await playerAudio.play();isPlaying=true;
     document.getElementById('apbPlayBtn').textContent='⏸';
-    highlightActiveAyah(elId);preloadNextAyah(index+1,reciterId);updateMediaSession(ayah);
+    highlightActiveAyah(elId);preloadNextAyah(index+1,reciterId);updateMediaSession(ayah);requestWakeLock();
   }catch(e){playAyah(index+1);}
 }
 async function preloadNextAyah(index,reciterId){
@@ -2429,6 +2439,7 @@ function stopAudioPlayback(){
   document.querySelectorAll('.ayah-block.active-ayah').forEach(el=>el.classList.remove('active-ayah'));
   try{if(bgOsc){bgOsc.stop();bgOsc.disconnect();bgOsc=null;}}catch(e){}
   try{if(bgAudioCtx){bgAudioCtx.close();bgAudioCtx=null;}}catch(e){}
+  releaseWakeLock();
 }
 function closeAudioPlayer(){stopAudioPlayback();document.getElementById('audioPlayerBar').classList.remove('show');}
 function cycleSpeed(){speedIndex=(speedIndex+1)%playbackSpeeds.length;playerAudio.playbackRate=playbackSpeeds[speedIndex];document.getElementById('apbSpeed').textContent=playbackSpeeds[speedIndex]+'x';}
@@ -2462,6 +2473,7 @@ window.onload = function() {
 
 let bgAudioCtx = null;
 let bgOsc = null;
+let bgInterval = null;
 
 
 document.addEventListener('visibilitychange', function() {
@@ -2475,10 +2487,19 @@ document.addEventListener('visibilitychange', function() {
       bgOsc.connect(bgAudioCtx.destination);
       bgOsc.start();
     } catch(e) {}
+    // Periodic keep-alive for browsers that suspend audio
+    bgInterval = setInterval(() => {
+      if (document.hidden && isPlaying) {
+        try {
+          if (bgAudioCtx && bgAudioCtx.state === 'suspended') bgAudioCtx.resume();
+        } catch(e) {}
+      }
+    }, 5000);
   } else if (!document.hidden) {
     // Screen back on — clean up
     try { if (bgOsc) { bgOsc.stop(); bgOsc.disconnect(); bgOsc = null; } } catch(e) {}
     try { if (bgAudioCtx) { bgAudioCtx.close(); bgAudioCtx = null; } } catch(e) {}
+    if (bgInterval) { clearInterval(bgInterval); bgInterval = null; }
   }
 });
 </script>
