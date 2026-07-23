@@ -8,7 +8,13 @@
 - Automatically releases when audio stops
 - Re-acquires wake lock on page visibility change if still playing
 
-### 2. Background Audio Keep-Alive
+### 2. NoSleep.js Fallback for Via Browser
+- Hidden looped video element keeps device awake (works in all browsers)
+- Activates when audio starts, stops when audio stops
+- NoSleep.js video: playsinline, muted, 1x1px offscreen
+- Fallback when Wake Lock API is unsupported (e.g. Via Browser)
+
+### 3. Background Audio Keep-Alive
 - Periodic 5-second interval to resume AudioContext when hidden
 - Prevents browser suspension of background audio on Android/iOS
 - Complements existing oscillator hack for iOS Safari
@@ -23,6 +29,7 @@
 
 ## Git Log
 ```
+953c539 feat: NoSleep.js fallback for Via Browser background playback
 c9e308e feat: Wake Lock API + background audio keep-alive for screen-off playback
 a358e44 docs: conversation backup session 3
 3681586 fix: skip pre-Bismillah for Al-Fatihah (ayah 1 IS the Bismillah)
@@ -49,4 +56,5 @@ e765741 fix: remove old audio module, fix highlightAyah conflict
 - **Media Session**: Background playback + lock screen controls
 - **Continuous Mode**: Auto-advances to next surah (localStorage)
 - **Wake Lock**: `navigator.wakeLock.request('screen')` prevents screen sleep
+- **NoSleep.js**: Hidden video keeps device awake (Via Browser fallback)
 - **Keep-Alive**: 5s interval resumes AudioContext when hidden
