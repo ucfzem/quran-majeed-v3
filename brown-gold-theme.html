@@ -3,7 +3,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lecteur Coran - Thème Brun Doré</title>
-    <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Scheherazade+New:wght@400;700&display=swap" rel="stylesheet">
     <style>
         :root {
             --bg-dark-brown: #24160d;
@@ -17,7 +19,8 @@
         body {
             background-color: var(--bg-dark-brown);
             color: var(--white-text);
-            font-family: 'Amiri', serif, sans-serif;
+            font-family: 'Scheherazade New', 'Amiri', Tahoma, Arial, sans-serif;
+            font-feature-settings: "rlig" 1, "calt" 1;
             margin: 0;
             padding: 0;
         }
@@ -67,6 +70,8 @@
 
         .arabic-text {
             color: var(--gold-text);
+            font-family: 'Scheherazade New', 'Amiri', Tahoma, Arial, sans-serif;
+            font-feature-settings: "rlig" 1, "calt" 1;
             font-size: 1.8rem;
             line-height: 2.2;
             word-spacing: 2px;
