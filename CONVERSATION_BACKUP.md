@@ -1,34 +1,41 @@
-# Conversation Backup — 2026-07-23 (Session 3)
+# Conversation Backup — 2026-07-24 (Session 4)
 
 ## Changes Made
 
-### 1. Screen Wake Lock API
-- Added `navigator.wakeLock.request('screen')` when audio plays
-- Prevents screen from dimming/turning off during playback
-- Automatically releases when audio stops
-- Re-acquires wake lock on page visibility change if still playing
+### 1. Arabic Font Fix (Tofu/Squares on TV)
+- **Problem**: Arabic/Quranic text displayed as empty squares ("tofu") on TV devices
+- **Root cause**: TV browsers lack proper Arabic font support, especially for complex tashkil/diacritization
+- **Solution**: Added `Scheherazade New` (Google Fonts) as primary Arabic font with system fallbacks
 
-### 2. NoSleep.js Fallback for Via Browser
-- Hidden looped video element keeps device awake (works in all browsers)
-- Activates when audio starts, stops when audio stops
-- NoSleep.js video: playsinline, muted, 1x1px offscreen
-- Fallback when Wake Lock API is unsupported (e.g. Via Browser)
+### 2. brown-gold-theme.html
+- Added `preconnect` links to Google Fonts for faster loading
+- Updated Google Fonts URL to include `Scheherazade New` (was missing)
+- Updated `body` and `.arabic-text` font-family: `'Scheherazade New', 'Amiri', Tahoma, Arial, sans-serif`
+- Added `font-feature-settings: "rlig" 1, "calt" 1` for Arabic ligature rendering
 
-### 3. Background Audio Keep-Alive
-- Periodic 5-second interval to resume AudioContext when hidden
-- Prevents browser suspension of background audio on Android/iOS
-- Complements existing oscillator hack for iOS Safari
-
-### 3. Conversation Backup
-- This file updated for Session 3
+### 3. index.html
+- Updated `body` font-family from `'Amiri', 'Scheherazade New', serif` to `'Scheherazade New', 'Amiri', Tahoma, Arial, sans-serif`
+- Added `font-feature-settings: "rlig" 1, "calt" 1` to body
+- Updated 8 Arabic text selectors with consistent font stack:
+  - `.ayah-arabic` (main Quran text)
+  - `.surah-name-ar` (sidebar)
+  - `.welcome h2`
+  - `.reciter-dropdown`
+  - `.ayah-tafsir-content`
+  - `.result-arabic` (search results)
+  - `.wby-word .ar` (word-by-word)
+  - Footer inline style
 
 ### 4. Deployments
-- GitHub Pages (auto): https://ucfzem.github.io/quran-majeed-v3/
+- GitHub: https://github.com/ucfzem/quran-majeed-v3
 - Vercel: https://quran-majeed-v3.vercel.app
+- GitHub Pages (auto): https://ucfzem.github.io/quran-majeed-v3/
 - Cloudflare Workers: https://quran-majeed.azer-tyu199p.workers.dev
 
 ## Git Log
 ```
+9cfa1c8 fix: add Arabic font fallbacks to prevent tofu/squares on TV devices
+fed4475 feat: NoSleep.js fallback for Via Browser background playback
 953c539 feat: NoSleep.js fallback for Via Browser background playback
 c9e308e feat: Wake Lock API + background audio keep-alive for screen-off playback
 a358e44 docs: conversation backup session 3
@@ -58,3 +65,4 @@ e765741 fix: remove old audio module, fix highlightAyah conflict
 - **Wake Lock**: `navigator.wakeLock.request('screen')` prevents screen sleep
 - **NoSleep.js**: Hidden video keeps device awake (Via Browser fallback)
 - **Keep-Alive**: 5s interval resumes AudioContext when hidden
+- **Arabic Fonts**: Scheherazade New → Amiri → Tahoma → Arial → sans-serif
