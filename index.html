@@ -2310,15 +2310,9 @@ loadSurah = function(num, scrollToAyah, forceNormal) {
 };
 
 
-const RECITERS=[{key:'husr',label:'الحصري'},{key:'shur',label:'الشريم'},{key:'ajm',label:'العجمي'},{key:'maher',label:'المعيقلي'},{key:'minsh',label:'المنشاوي'},{key:'bader',label:'بدر التركي'}];
+const RECITERS=[{key:'husr',label:'الحصري'},{key:'shur',label:'الشريم'},{key:'ajm',label:'العجمي'},{key:'maher',label:'المعيقلي'},{key:'minsh',label:'المنشاوي'}];
 const RECITER_MATCH={husr:['husary','hussary'],shur:['shuraym','shuraim'],ajm:['ajamy','ajmy','ajmi'],maher:['muaiqly','moaiqly'],minsh:['minshawi']};
 const RECITER_FALLBACK={husr:'ar.husary',shur:'ar.shuraim',ajm:'ar.ahmedajamy',maher:'ar.mahermuaiqly',minsh:'ar.minshawi'};
-const BADER_BASE='https://server10.mp3quran.net/download/bader/Rewayat-Hafs-A-n-Assem';
-function getAyahAudioUrl(reciterKey,surah,ayah){
-  if(reciterKey==='bader')return `${BADER_BASE}/${String(surah).padStart(3,'0')}.mp3`;
-  return null;
-}
-function isWholeSurahReciter(key){return key==='bader';}
 let selectedReciter=localStorage.getItem('selectedReciter')||'maher';
 let reciterIds=null;
 async function resolveReciterIds(){
@@ -2417,10 +2411,13 @@ async function playAyah(index){
   document.getElementById('audioPlayerBar').classList.add('show');
   document.getElementById('apbInfo').textContent='آية '+ayah+' / '+playQueue.length;
   updateProgress();
-  if(ayah===1&&surah!==9&&surah!==1&&!isWholeSurahReciter(selectedReciter)){
+  const ids=await resolveReciterIds();const reciterId=ids[selectedReciter];
+  if(ayah===1&&surah!==9&&surah!==1){
     playingBismillah=true;
     try{
-      playerAudio.src=await getAudioSource(selectedReciter,1,1);playerAudio.playbackRate=playbackSpeeds[speedIndex];
+      const res=await fetch(`https://api.alquran.cloud/v1/ayah/1:1/${reciterId}`);
+      const data=await res.json();
+      playerAudio.src=data.data.audio;playerAudio.playbackRate=playbackSpeeds[speedIndex];
       await playerAudio.play();isPlaying=true;
       document.getElementById('apbPlayBtn').textContent='⏸';
       document.getElementById('apbInfo').textContent='بسم الله — آية 1 / '+playQueue.length;
@@ -2430,22 +2427,17 @@ async function playAyah(index){
   }
   playingBismillah=false;
   try{
-    playerAudio.src=await getAudioSource(selectedReciter,surah,ayah);playerAudio.playbackRate=playbackSpeeds[speedIndex];
+    const res=await fetch(`https://api.alquran.cloud/v1/ayah/${surah}:${ayah}/${reciterId}`);
+    const data=await res.json();
+    playerAudio.src=data.data.audio;playerAudio.playbackRate=playbackSpeeds[speedIndex];
     await playerAudio.play();isPlaying=true;
     document.getElementById('apbPlayBtn').textContent='⏸';
-    highlightActiveAyah(elId);preloadNextAyah(index+1,selectedReciter);updateMediaSession(ayah);requestWakeLock();startNoSleep();
+    highlightActiveAyah(elId);preloadNextAyah(index+1,reciterId);updateMediaSession(ayah);requestWakeLock();startNoSleep();
   }catch(e){playAyah(index+1);}
-}
-async function getAudioSource(reciterKey,surah,ayah){
-  const url=getAyahAudioUrl(reciterKey,surah,ayah);
-  if(url)return url;
-  const ids=await resolveReciterIds();const reciterId=ids[reciterKey];
-  const res=await fetch(`https://api.alquran.cloud/v1/ayah/${surah}:${ayah}/${reciterId}`);
-  const data=await res.json();return data.data.audio;
 }
 async function preloadNextAyah(index,reciterId){
   if(index>=playQueue.length)return;const{surah,ayah}=playQueue[index];
-  try{preloadAudio.src=await getAudioSource(reciterId,surah,ayah);preloadAudio.load();}catch(e){}
+  try{const res=await fetch(`https://api.alquran.cloud/v1/ayah/${surah}:${ayah}/${reciterId}`);const data=await res.json();preloadAudio.src=data.data.audio;preloadAudio.load();}catch(e){}
 }
 function highlightActiveAyah(elId){
   document.querySelectorAll('.ayah-block.active-ayah').forEach(el=>el.classList.remove('active-ayah'));
@@ -2456,11 +2448,14 @@ playerAudio.addEventListener('ended',async()=>{
   if(playingBismillah){
     playingBismillah=false;
     const{surah,ayah,elId}=playQueue[playIndex];
+    const ids=await resolveReciterIds();const reciterId=ids[selectedReciter];
     try{
-      playerAudio.src=await getAudioSource(selectedReciter,surah,ayah);playerAudio.playbackRate=playbackSpeeds[speedIndex];
+      const res=await fetch(`https://api.alquran.cloud/v1/ayah/${surah}:${ayah}/${reciterId}`);
+      const data=await res.json();
+      playerAudio.src=data.data.audio;playerAudio.playbackRate=playbackSpeeds[speedIndex];
       await playerAudio.play();
       document.getElementById('apbPlayBtn').textContent='⏸';
-      highlightActiveAyah(elId);preloadNextAyah(playIndex+1,selectedReciter);
+      highlightActiveAyah(elId);preloadNextAyah(playIndex+1,reciterId);
     }catch(e){playAyah(playIndex+1);}
     return;
   }

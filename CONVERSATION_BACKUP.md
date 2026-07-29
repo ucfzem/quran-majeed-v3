@@ -64,14 +64,10 @@ e765741 fix: remove old audio module, fix highlightAyah conflict
 - **Files**: `index.html` (lines 1756–1780)
 - **Commit**: `80dc995`
 
-### 5. Added Reciter بدر التركي (Badr Al-Turki) — 2026-07-29
-- **Added** `بدر التركي` to `RECITERS` array
-- **Audio source**: `https://server10.mp3quran.net/download/bader/Rewayat-Hafs-A-n-Assem/{surah}.mp3` (full surah files, not ayah-by-ayah)
-- **New helper functions**: `getAyahAudioUrl()`, `getAudioSource()`, `isWholeSurahReciter()`
-- **Refactored** `playAyah()` and `preloadNextAyah()` to support both direct URL and QuranCloud API reciters
-- **Basmalah** skipped for whole-surah reciters (bader)
-- **Files**: `index.html`
-- **Commit**: pending
+### 5. Added Reciter بدر التركي (Badr Al-Turki) — 2026-07-29 (removed)
+- **Added** بدر التركي to RECITERS with audio from mp3quran.net (full surah MP3s)
+- **Problem**: App requires ayah-by-ayah streaming, bader only has full surah files
+- **Removed**: Reverted all bader-related changes. Not compatible with current audio engine.
 
 ## Architecture
 - **Audio Engine**: `api.alquran.cloud/v1/ayah/{surah}:{ayah}/{reciterId}`
