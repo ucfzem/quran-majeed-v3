@@ -1755,8 +1755,6 @@ function performGlobalSearch(query) {
 
         const exactQuery = normalizeArabic(query, false);
         const fuzzyQuery = normalizeArabic(query, true);
-        const exactRegex = new RegExp(exactQuery.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i');
-        const fuzzyRegex = new RegExp(fuzzyQuery.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i');
         let exactMatches = [];
         let fuzzyMatches = [];
         const seenExact = new Set();
@@ -1764,9 +1762,23 @@ function performGlobalSearch(query) {
 
         for (const surah of surahs) {
           for (const ayah of surah.ayahs) {
-            const exactText = normalizeArabic(ayah.text, false);
-            const exact = exactRegex.test(exactText);
-            const fuzzy = !exact && fuzzyRegex.test(normalizeArabic(ayah.text, true));
+            const exactWords = normalizeArabic(ayah.text, false).split(/\s+/);
+            const exact = exactWords.some(w => {
+              if (w.startsWith(exactQuery)) return true;
+              if (w.startsWith('\u0627\u0644') && w.slice(2).startsWith(exactQuery)) return true;
+              return w.startsWith('\u0641') && w.slice(1).startsWith(exactQuery) ||
+                     w.startsWith('\u0648') && w.slice(1).startsWith(exactQuery) ||
+                     w.startsWith('\u0628') && w.slice(1).startsWith(exactQuery) ||
+                     w.startsWith('\u0644') && w.slice(1).startsWith(exactQuery);
+            });
+            const fuzzy = !exact && normalizeArabic(ayah.text, true).split(/\s+/).some(w => {
+              if (w.startsWith(fuzzyQuery)) return true;
+              if (w.startsWith('\u0627\u0644') && w.slice(2).startsWith(fuzzyQuery)) return true;
+              return w.startsWith('\u0641') && w.slice(1).startsWith(fuzzyQuery) ||
+                     w.startsWith('\u0648') && w.slice(1).startsWith(fuzzyQuery) ||
+                     w.startsWith('\u0628') && w.slice(1).startsWith(fuzzyQuery) ||
+                     w.startsWith('\u0644') && w.slice(1).startsWith(fuzzyQuery);
+            });
             if (exact || fuzzy) {
               const cached = translationCache[`surah-${surah.number}`] || [];
               const t = cached.find(c => c.ayah === ayah.numberInSurah);
