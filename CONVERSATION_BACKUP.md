@@ -57,6 +57,13 @@ e765741 fix: remove old audio module, fix highlightAyah conflict
 973bf1c feat: 5 reciters via alquran.cloud API + per-ayah audio + player bar
 ```
 
+### 4. Arabic Search Fix (Word-Boundary Matching) — 2026-07-29
+- **Problem**: Searching for `آدم` (Adam) matched `نادمين` (remorseful) as substring
+- **Root cause**: `RegExp.test()` did substring matching — `ادم` (normalized) matched inside `نادمين`
+- **Fix**: Tokenize verse into words, match `w.startsWith(query)`, handle Arabic prefixes (`ال`, `ف`, `و`, `ب`, `ل`)
+- **Files**: `index.html` (lines 1756–1780)
+- **Commit**: `80dc995`
+
 ## Architecture
 - **Audio Engine**: `api.alquran.cloud/v1/ayah/{surah}:{ayah}/{reciterId}`
 - **Reciters**: الحصري، الشريم، العجمي، المعيقلي، المنشاوي (auto-resolved)
