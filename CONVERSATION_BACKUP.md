@@ -69,6 +69,12 @@ e765741 fix: remove old audio module, fix highlightAyah conflict
 - **Problem**: App requires ayah-by-ayah streaming, bader only has full surah files
 - **Removed**: Reverted all bader-related changes. Not compatible with current audio engine.
 
+### 6. Added Reciter محمد أيوب (Muhammad Ayyoub) — 2026-07-30
+- **Added** `ayyoub` key to RECITERS with label 'محمد أيوب'
+- **Identifier**: `ar.muhammadayyoub` — confirmed working on QuranCloud API
+- **Source**: `https://api.alquran.cloud/v1/ayah/{surah}:{ayah}/ar.muhammadayyoub`
+- **Note**: User also requested Ali Jaber, Sahl Yassin, Yasser Ad-Dosari — none are available on QuranCloud API as versebyverse audio reciters
+
 ## Architecture
 - **Audio Engine**: `api.alquran.cloud/v1/ayah/{surah}:{ayah}/{reciterId}`
 - **Reciters**: الحصري، الشريم، العجمي، المعيقلي، المنشاوي (auto-resolved)

@@ -2310,9 +2310,9 @@ loadSurah = function(num, scrollToAyah, forceNormal) {
 };
 
 
-const RECITERS=[{key:'husr',label:'الحصري'},{key:'shur',label:'الشريم'},{key:'ajm',label:'العجمي'},{key:'maher',label:'المعيقلي'},{key:'minsh',label:'المنشاوي'}];
-const RECITER_MATCH={husr:['husary','hussary'],shur:['shuraym','shuraim'],ajm:['ajamy','ajmy','ajmi'],maher:['muaiqly','moaiqly'],minsh:['minshawi']};
-const RECITER_FALLBACK={husr:'ar.husary',shur:'ar.shuraim',ajm:'ar.ahmedajamy',maher:'ar.mahermuaiqly',minsh:'ar.minshawi'};
+const RECITERS=[{key:'husr',label:'الحصري'},{key:'shur',label:'الشريم'},{key:'ajm',label:'العجمي'},{key:'maher',label:'المعيقلي'},{key:'minsh',label:'المنشاوي'},{key:'ayyoub',label:'محمد أيوب'}];
+const RECITER_MATCH={husr:['husary','hussary'],shur:['shuraym','shuraim'],ajm:['ajamy','ajmy','ajmi'],maher:['muaiqly','moaiqly'],minsh:['minshawi'],ayyoub:['muhammadayyoub','ayyoub','ayyub']};
+const RECITER_FALLBACK={husr:'ar.husary',shur:'ar.shuraim',ajm:'ar.ahmedajamy',maher:'ar.mahermuaiqly',minsh:'ar.minshawi',ayyoub:'ar.muhammadayyoub'};
 let selectedReciter=localStorage.getItem('selectedReciter')||'maher';
 let reciterIds=null;
 async function resolveReciterIds(){
