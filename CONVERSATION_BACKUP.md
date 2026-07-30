@@ -69,12 +69,8 @@ e765741 fix: remove old audio module, fix highlightAyah conflict
 - **Problem**: App requires ayah-by-ayah streaming, bader only has full surah files
 - **Removed**: Reverted all bader-related changes. Not compatible with current audio engine.
 
-### 6. Added Reciter محمد أيوب (Muhammad Ayyoub) — 2026-07-30
-- **Added** `ayyoub` key to RECITERS with label 'محمد أيوب'
-- **Identifier**: `ar.muhammadayyoub` — confirmed working on QuranCloud API
-- **Source**: `https://api.alquran.cloud/v1/ayah/{surah}:{ayah}/ar.muhammadayyoub`
-
-### 7. Added 3 EveryAyah Reciters (علي جابر, سهل ياسين, ياسر الدوسري) — 2026-07-30
+### 6. Added 3 EveryAyah Reciters (علي جابر, سهل ياسين, ياسر الدوسري) — 2026-07-30
+- Note: محمد أيوب was briefly added then removed (user requested clear)
 - **Ali Jaber** (`ali_jaber`): `https://everyayah.com/data/Ali_Jaber_64kbps/{s:03d}{a:03d}.mp3`
 - **Sahl Yassin** (`sahl`): `https://everyayah.com/data/Sahl_Yassin_128kbps/{s:03d}{a:03d}.mp3`
 - **Yasser Ad-Dosari** (`dussary`): `https://everyayah.com/data/Yasser_Ad-Dussary_128kbps/{s:03d}{a:03d}.mp3`
@@ -84,7 +80,7 @@ e765741 fix: remove old audio module, fix highlightAyah conflict
 
 ## Architecture
 - **Audio Engine**: `api.alquran.cloud/v1/ayah/{surah}:{ayah}/{reciterId}`
-- **Reciters**: الحصري، الشريم، العجمي، المعيقلي، المنشاوي، محمد أيوب، علي جابر، سهل ياسين، ياسر الدوسري (9 total)
+- **Reciters**: الحصري، الشريم، العجمي، المعيقلي، المنشاوي، علي جابر، سهل ياسين، ياسر الدوسري (8 total)
 - **Audio Source**: QuranCloud API for most reciters; EveryAyah.com direct MP3 for Ali Jaber, Sahl Yassin, Yasser Ad-Dosari
 - **Media Session**: Background playback + lock screen controls
 - **Continuous Mode**: Auto-advances to next surah (localStorage)

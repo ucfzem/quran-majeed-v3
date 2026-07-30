@@ -2310,9 +2310,9 @@ loadSurah = function(num, scrollToAyah, forceNormal) {
 };
 
 
-const RECITERS=[{key:'husr',label:'الحصري'},{key:'shur',label:'الشريم'},{key:'ajm',label:'العجمي'},{key:'maher',label:'المعيقلي'},{key:'minsh',label:'المنشاوي'},{key:'ayyoub',label:'محمد أيوب'},{key:'ali_jaber',label:'علي جابر'},{key:'sahl',label:'سهل ياسين'},{key:'dussary',label:'ياسر الدوسري'}];
-const RECITER_MATCH={husr:['husary','hussary'],shur:['shuraym','shuraim'],ajm:['ajamy','ajmy','ajmi'],maher:['muaiqly','moaiqly'],minsh:['minshawi'],ayyoub:['muhammadayyoub','ayyoub','ayyub'],ali_jaber:['ali_jaber'],sahl:['sahl_yassin','yassin'],dussary:['yasser_ad_dussary','ad_dussary','dussary']};
-const RECITER_FALLBACK={husr:'ar.husary',shur:'ar.shuraim',ajm:'ar.ahmedajamy',maher:'ar.mahermuaiqly',minsh:'ar.minshawi',ayyoub:'ar.muhammadayyoub',ali_jaber:'ar.alijaber',sahl:'ar.sahlyassin',dussary:'ar.yasserdosari'};
+const RECITERS=[{key:'husr',label:'الحصري'},{key:'shur',label:'الشريم'},{key:'ajm',label:'العجمي'},{key:'maher',label:'المعيقلي'},{key:'minsh',label:'المنشاوي'},{key:'ali_jaber',label:'علي جابر'},{key:'sahl',label:'سهل ياسين'},{key:'dussary',label:'ياسر الدوسري'}];
+const RECITER_MATCH={husr:['husary','hussary'],shur:['shuraym','shuraim'],ajm:['ajamy','ajmy','ajmi'],maher:['muaiqly','moaiqly'],minsh:['minshawi'],ali_jaber:['ali_jaber'],sahl:['sahl_yassin','yassin'],dussary:['yasser_ad_dussary','ad_dussary','dussary']};
+const RECITER_FALLBACK={husr:'ar.husary',shur:'ar.shuraim',ajm:'ar.ahmedajamy',maher:'ar.mahermuaiqly',minsh:'ar.minshawi',ali_jaber:'ar.alijaber',sahl:'ar.sahlyassin',dussary:'ar.yasserdosari'};
 const RECITER_EVERYAYAH={ali_jaber:'Ali_Jaber_64kbps',sahl:'Sahl_Yassin_128kbps',dussary:'Yasser_Ad-Dussary_128kbps'};
 async function getAyahUrl(surah,ayah,reciterKey){
   const folder=RECITER_EVERYAYAH[reciterKey];
