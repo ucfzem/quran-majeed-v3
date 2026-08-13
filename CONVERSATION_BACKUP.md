@@ -169,12 +169,20 @@ e765741 fix: remove old audio module, fix highlightAyah conflict
 - `c0b4705` Tafsir: make Quran.com API primary, use qurancdn API as fallback (drop dead jsDelivr CDN) (pushed to origin/main)
 - `ea65529` Tafsir UX: strip HTML tags, auto-close other open tafsirs, hide copy button on close (pushed to origin/main)
 - `d1a2026` Fix as-Sudais/Shuraim reciter: use 64kbps audio (only bitrate available on CDN) (pushed to origin/main)
+- `1b5028e` Fix Ghamdi (الغامدي) reciter: route through EveryAyah Ghamadi_40kbps (pushed to origin/main)
 
 ### Shuraim (الشريم) audio fix (Session 9 continued)
 - User reported reciter `ar.saoodshuraym` (Saood bin Ibraaheem Ash-Shuraym) no longer plays.
 - Root cause: `cdn.islamic.network/quran/audio/128/ar.saoodshuraym/{ayah}.mp3` returns S3 AccessDenied (403) — the files only exist at **64kbps**. Confirmed by `cdn.alquran.cloud` itself redirecting to `/quran/audio/64/ar.saoodshuraym/...`.
 - Fix (`d1a2026`): `getAudioUrl()` now picks `64` for `ar.saoodshuraym`, else `128`. All other reciters unaffected (verified `ar.husary`, `ar.minshawi`, `ar.hudhaify` OK at 128).
 - Redeployed: Pages ✅, Vercel ✅, Workers ✅ (Version ID `de5af514-a71d-45b9-a09c-d2ec2ec4e059`; needed `rm -rf .wrangler` first — stale cache caused a spurious permission error).
+
+### Ghamdi (سعد الغامدي) audio fix (Session 9 continued)
+- User reported `ar.ghamadi` also doesn't play.
+- Root cause: `ar.ghamadi` does NOT exist on `cdn.islamic.network` (all bitrates 403, and the alquran.cloud redirect shows an empty bitrate segment `audio//ar.ghamadi`). It's not in alquran.cloud's or quran.com's recitation lists either.
+- Verified working source: EveryAyah `Ghamadi_40kbps` (HTTP 200 across the Quran: 1:1, 2:49, 10:1, 50:1, 114:1).
+- Fix (`1b5028e`): `getAudioUrl()` now uses a folder map for EveryAyah-based reciters (`ar.abdulbasitmurattal` → `Abdul_Basit_Murattal_192kbps`, `ar.ghamadi` → `Ghamadi_40kbps`), else falls back to islamic.network with the Shuraim 64kbps exception.
+- Redeployed: Pages ✅, Vercel ✅, Workers ✅ (Version ID `91ca51a4-0bd3-4981-b233-9754c17f8d4d`).
 
 ### Tafsir tweaks (Session 9 continued, after the URL swap)
 - `c0b4705` Tafsir: **Quran.com API is now PRIMARY** (`api.quran.com/api/v4/tafsirs/ar-tafsir-ibn-kathir/by_ayah/{s}:{a}`), fallback = `api.qurancdn.com/api/qdc/tafsirs/...` (tested HTTP 200, real Ibn Kathir). Dropped the two dead jsDelivr CDN repos (both 404).
