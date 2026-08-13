@@ -165,6 +165,17 @@ e765741 fix: remove old audio module, fix highlightAyah conflict
 ### Git log (new)
 - `6a7918e` Fix bottom progress bar to show global surah progress instead of per-ayah progress (pushed to origin/main)
 - `7fb559e` Add dual-URL tafsir loading with automatic fallback (jsDelivr CDN -> Quran.com API) (pushed to origin/main)
+- `48d845e` Add copy-to-clipboard button for tafsir; update primary CDN URL to quran/tafseer-data (pushed to origin/main)
+- `c0b4705` Tafsir: make Quran.com API primary, use qurancdn API as fallback (drop dead jsDelivr CDN) (pushed to origin/main)
+- `ea65529` Tafsir UX: strip HTML tags, auto-close other open tafsirs, hide copy button on close (pushed to origin/main)
+
+### Tafsir tweaks (Session 9 continued, after the URL swap)
+- `c0b4705` Tafsir: **Quran.com API is now PRIMARY** (`api.quran.com/api/v4/tafsirs/ar-tafsir-ibn-kathir/by_ayah/{s}:{a}`), fallback = `api.qurancdn.com/api/qdc/tafsirs/...` (tested HTTP 200, real Ibn Kathir). Dropped the two dead jsDelivr CDN repos (both 404).
+- `ea65529` Tafsir UX (user's 3 tweaks):
+  1. **Strip HTML tags** from tafsir text with `replace(/<[^>]*>/g,"")` before display (Quran.com returns `<p>`/`<sup>`).
+  2. **Auto-close other open tafsir boxes** on mobile (`querySelectorAll(".ayah-tafsir-container")` + hide all `[id^="btn-copier-"]` + reset button opacity).
+  3. **Hide the "📋 Copier" button** when the box is closed.
+- Copy button feature (`48d845e`): per-ayah `📋 Copier` button, hidden until tafsir loads, uses `navigator.clipboard.writeText`, shows "✅ Copié !" for 2s.
 
 ### Tafsir fallback (Session 9 continued)
 - Replaced the single-source whole-surah Tafsir fetch (`api.alquran.cloud/v1/surah/{n}/ar.muyassar`) with per-ayah **Ibn Kathir** loading using the user's dual-URL fallback pattern:
