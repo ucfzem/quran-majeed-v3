@@ -187,7 +187,10 @@ e765741 fix: remove old audio module, fix highlightAyah conflict
 ### Deployment status (2026-08-13)
 - GitHub Pages: HTTP 200 — serves new build, markers `currentSurahAyahs.length||1` + `api.quran.com/api/v4/tafsirs` confirmed ✅
 - Vercel: HTTP 200 — serves new build, both markers confirmed ✅
-- Cloudflare Workers: ⚠️ NOT redeployed — no `CLOUDFLARE_API_TOKEN` in environment. Needs the user's CF token to run `wrangler deploy`.
+- Cloudflare Workers: ✅ redeployed via `wrangler deploy` with user's token (Version ID `194ad210-65bb-48c4-8cb7-9b0889c768f2`), HTTP 200, both markers confirmed. All three deployments now identical.
+
+### Cloudflare deployment note (final)
+- The CF token was pasted in chat a second time for this final deploy. **Recommendation: rotate the token now** on dash.cloudflare.com (it has now appeared in two conversations). The token was never written to any file; only used as an env var for the deploy command.
 
 ### Security note
 - The GitHub token (x-access-token) is embedded in the credentialed clone's `.git/config` remote URL. Recommended to rotate it if that machine is not fully trusted.
