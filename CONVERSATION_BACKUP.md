@@ -170,6 +170,7 @@ e765741 fix: remove old audio module, fix highlightAyah conflict
 - `ea65529` Tafsir UX: strip HTML tags, auto-close other open tafsirs, hide copy button on close (pushed to origin/main)
 - `d1a2026` Fix as-Sudais/Shuraim reciter: use 64kbps audio (only bitrate available on CDN) (pushed to origin/main)
 - `1b5028e` Fix Ghamdi (الغامدي) reciter: route through EveryAyah Ghamadi_40kbps (pushed to origin/main)
+- `d0008b2` Fix dead copy-tafsir button: restore copierTafsir + robust clipboard fallback (pushed to origin/main)
 
 ### Shuraim (الشريم) audio fix (Session 9 continued)
 - User reported reciter `ar.saoodshuraym` (Saood bin Ibraaheem Ash-Shuraym) no longer plays.
@@ -183,6 +184,12 @@ e765741 fix: remove old audio module, fix highlightAyah conflict
 - Verified working source: EveryAyah `Ghamadi_40kbps` (HTTP 200 across the Quran: 1:1, 2:49, 10:1, 50:1, 114:1).
 - Fix (`1b5028e`): `getAudioUrl()` now uses a folder map for EveryAyah-based reciters (`ar.abdulbasitmurattal` → `Abdul_Basit_Murattal_192kbps`, `ar.ghamadi` → `Ghamadi_40kbps`), else falls back to islamic.network with the Shuraim 64kbps exception.
 - Redeployed: Pages ✅, Vercel ✅, Workers ✅ (Version ID `91ca51a4-0bd3-4981-b233-9754c17f8d4d`).
+
+### Dead copy-tafsir button — regression + fix (Session 9 continued)
+- User reported the 📋 Copier button does nothing.
+- Root cause: the `copierTafsir()` function had been **silently deleted** during the tafsir tweaks refactor (commit `ea65529`). The python replacement span for `toggleTafsir` (from `async function toggleTafsir` up to `function openGlobalSearch`) also covered `copierTafsir`, which sat between them. Confirmed via git: `48d845e` has the function (1), `ea65529` lost it (0). The `onclick` stayed, so clicks hit a `ReferenceError`.
+- Fix (`d0008b2`): restored `copierTafsir()` with a **robust clipboard**: tries `navigator.clipboard.writeText`, and on rejection/unavailability falls back to a hidden `textarea` + `document.execCommand("copy")` (works on browsers that block the async clipboard API, e.g. the Via browser). Shows "✅ Copié !" on success or "❌ Échec" on failure for 2s.
+- Redeployed: Pages ✅, Vercel ✅, Workers ✅ (Version ID `9c3f4cff-ef8a-4b2d-9a77-15c19fb21ce4`).
 
 ### Tafsir tweaks (Session 9 continued, after the URL swap)
 - `c0b4705` Tafsir: **Quran.com API is now PRIMARY** (`api.quran.com/api/v4/tafsirs/ar-tafsir-ibn-kathir/by_ayah/{s}:{a}`), fallback = `api.qurancdn.com/api/qdc/tafsirs/...` (tested HTTP 200, real Ibn Kathir). Dropped the two dead jsDelivr CDN repos (both 404).
