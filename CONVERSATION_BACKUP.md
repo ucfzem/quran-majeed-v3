@@ -164,10 +164,18 @@ e765741 fix: remove old audio module, fix highlightAyah conflict
 
 ### Git log (new)
 - `6a7918e` Fix bottom progress bar to show global surah progress instead of per-ayah progress (pushed to origin/main)
+- `7fb559e` Add dual-URL tafsir loading with automatic fallback (jsDelivr CDN -> Quran.com API) (pushed to origin/main)
+
+### Tafsir fallback (Session 9 continued)
+- Replaced the single-source whole-surah Tafsir fetch (`api.alquran.cloud/v1/surah/{n}/ar.muyassar`) with per-ayah **Ibn Kathir** loading using the user's dual-URL fallback pattern:
+  1. Primary: `https://cdn.jsdelivr.net/gh/spa28/quran-tafsir@main/tafseer/ar-tafsir-ibn-kathir/{surah}/{ayah}.json`
+  2. Fallback: `https://api.quran.com/api/v4/tafsirs/ar-tafsir-ibn-kathir/by_ayah/{surah}:{ayah}`
+- `toggleTafsir()` now opens/closes, shows ⏳ loading, tries URL 1 then URL 2 automatically, caches per-ayah text in `currentTafsirData` for the current surah, and shows a red error only if BOTH sources fail.
+- ⚠️ Verified: the `spa28/quran-tafsir` repo does NOT exist publicly (GitHub 404), so URL 1 always fails and URL 2 (Quran.com, HTTP 200, 33KB+ Ibn Kathir text) serves the content. Fallback mechanism guarantees the Tafsir still displays.
 
 ### Deployment status (2026-08-13)
-- GitHub Pages: HTTP 200 — serves new build, marker `currentSurahAyahs.length||1` confirmed ✅
-- Vercel: HTTP 200 — serves new build, marker confirmed ✅
+- GitHub Pages: HTTP 200 — serves new build, markers `currentSurahAyahs.length||1` + `api.quran.com/api/v4/tafsirs` confirmed ✅
+- Vercel: HTTP 200 — serves new build, both markers confirmed ✅
 - Cloudflare Workers: ⚠️ NOT redeployed — no `CLOUDFLARE_API_TOKEN` in environment. Needs the user's CF token to run `wrangler deploy`.
 
 ### Security note
