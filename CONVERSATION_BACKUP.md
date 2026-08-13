@@ -124,7 +124,7 @@ e765741 fix: remove old audio module, fix highlightAyah conflict
 ### Deployment status (verified 2026-08-13)
 - GitHub Pages: HTTP 200 — serves new minified build (74,179 bytes), Moroccan flag + EveryAyah CDN confirmed ✅
 - Vercel: HTTP 200 — serves new build, all markers confirmed ✅
-- Cloudflare Workers: HTTP 200 but serves OLD cached build (113,091 bytes) — requires `wrangler deploy` with CF credentials; needs manual dashboard deploy
+- Cloudflare Workers: deployed via wrangler with user's token; serves new minified build (74,179 bytes) ✅
 
 ### Full conversation summary (Session 8)
 1. User reported critical bug: clicking Pause ⏸️ made the Quran scroll to the top by itself; ayahs did not stay in place.
@@ -136,7 +136,8 @@ e765741 fix: remove old audio module, fix highlightAyah conflict
    - Flag icon `🇸🇦` → `🇲🇦`
    - Minify & optimize (Terser JS + clean-css CSS + blank-line collapse; 94,131 → 74,179 bytes)
 6. Found credentialed clone at `/tmp/opencode/quran-majeed-v3`; committed and pushed `c962dac`.
-7. Verified GitHub Pages and Vercel deployments serve the new version. Cloudflare Workers still stale (no credentials available here).
+7. Verified GitHub Pages and Vercel deployments serve the new version.
+8. User provided a Cloudflare API token; verified with `/user/tokens/verify`, deployed via `wrangler deploy` (Version ID 22471132-13e0-4c44-a22d-cb497a482574). All three deployments now serve the new build.
 
 ### Links (all)
 - Repo: https://github.com/ucfzem/quran-majeed-v3
