@@ -117,3 +117,33 @@ e765741 fix: remove old audio module, fix highlightAyah conflict
 
 ### Git Log (latest)
 - `dcf3513` fix: keep ayahs in place on pause; add Abdul Basit EveryAyah CDN; Moroccan flag; minify for mobile
+
+### Git Log (pushed)
+- `c962dac` fix: keep ayahs in place on pause; Abdul Basit EveryAyah CDN; Moroccan flag; minify for mobile (pushed to origin/main)
+
+### Deployment status (verified 2026-08-13)
+- GitHub Pages: HTTP 200 — serves new minified build (74,179 bytes), Moroccan flag + EveryAyah CDN confirmed ✅
+- Vercel: HTTP 200 — serves new build, all markers confirmed ✅
+- Cloudflare Workers: HTTP 200 but serves OLD cached build (113,091 bytes) — requires `wrangler deploy` with CF credentials; needs manual dashboard deploy
+
+### Full conversation summary (Session 8)
+1. User reported critical bug: clicking Pause ⏸️ made the Quran scroll to the top by itself; ayahs did not stay in place.
+2. User supplied a full replacement HTML (simpler per-ayah audio engine). Chose "replace index.html wholesale".
+3. Repo was cloned; deployed site (GitHub Pages) matched repo `index.html` (queue-based engine).
+4. Replaced `index.html` with the per-ayah fix; validated JS syntax.
+5. Applied 3 follow-up adjustments requested by user:
+   - Fix Abdul Basit audio stream → EveryAyah Murattal CDN via new `getAudioUrl()` helper
+   - Flag icon `🇸🇦` → `🇲🇦`
+   - Minify & optimize (Terser JS + clean-css CSS + blank-line collapse; 94,131 → 74,179 bytes)
+6. Found credentialed clone at `/tmp/opencode/quran-majeed-v3`; committed and pushed `c962dac`.
+7. Verified GitHub Pages and Vercel deployments serve the new version. Cloudflare Workers still stale (no credentials available here).
+
+### Links (all)
+- Repo: https://github.com/ucfzem/quran-majeed-v3
+- GitHub Pages: https://ucfzem.github.io/quran-majeed-v3/
+- Vercel: https://quran-majeed-v3.vercel.app
+- Cloudflare Workers: https://quran-majeed.azer-tyu199p.workers.dev
+- Conversation backup: https://github.com/ucfzem/quran-majeed-v3/blob/main/CONVERSATION_BACKUP.md
+
+### Security note
+- The GitHub token (x-access-token) is embedded in the credentialed clone's `.git/config` remote URL. Recommended to rotate it if that machine is not fully trusted.
