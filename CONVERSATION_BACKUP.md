@@ -88,3 +88,32 @@ e765741 fix: remove old audio module, fix highlightAyah conflict
 - **NoSleep.js**: Hidden video keeps device awake (Via Browser fallback)
 - **Keep-Alive**: 5s interval resumes AudioContext when hidden
 - **Arabic Fonts**: Scheherazade New → Amiri → Tahoma → Arial → sans-serif
+
+## Session 8 — 2026-08-13 (pause scroll bug, Abdul Basit CDN, flag, minify)
+
+### 1. Critical: Quran auto-scrolled to top on Pause ⏸️ — FIXED
+- **Problem**: Clicking pause in the audio player made the page jump scroll back up; ayahs did not stay in place.
+- **Root cause**: The previous queue-based audio engine (`playerAudio`/`playQueue` with bismillah, wake-lock, NoSleep, auto-next-surah) tied scrolling to playback state and moved focus on pause. Full replacement done.
+- **Fix**: Rewrote audio engine to a per-ayah model (`audioObj`, `playAyahAudio()`, `toggleAudioPlayback()`, `currentAyahIndex`, `getGlobalAyahNumber()`). Pausing now only pauses and toggles the icon — no scroll, no re-render. The pause guard in `playAyahAudio()` leaves the ayah where it is.
+
+### 2. Abdul Basit audio stream not loading — FIXED
+- **Problem**: `ar.abdulbasitmurattal` returned broken streams via the islamic.network CDN.
+- **Fix**: Added `getAudioUrl(surahNum, ayahNum)` helper. When `currentReciter === 'ar.abdulbasitmurattal'`, it builds `https://everyayah.com/data/Abdul_Basit_Murattal_192kbps/{s:03d}{a:03d}.mp3`. All other reciters keep the `cdn.islamic.network/quran/audio/128/{reciter}/{globalAyah}.mp3` pattern.
+
+### 3. Flag icon — Saudi → Moroccan
+- Replaced `🇸🇦` with `🇲🇦` in the Arabic language entry (`{ code: 'ar', label: '🇲🇦 العربية (Arabic)' }`).
+
+### 4. Minify & mobile optimization
+- JS minified with Terser (compress on, mangle OFF so inline `onclick=` globals keep working).
+- CSS minified with clean-css (level 1).
+- Collapsed 594 blank lines / trailing spaces in HTML markup.
+- Kept external library dependencies at zero; audio stays lazy-loaded (`new Audio()` only created on play).
+
+### Deployments
+- GitHub: https://github.com/ucfzem/quran-majeed-v3
+- GitHub Pages (auto): https://ucfzem.github.io/quran-majeed-v3/
+- Vercel: https://quran-majeed-v3.vercel.app
+- Cloudflare Workers: https://quran-majeed.azer-tyu199p.workers.dev
+
+### Git Log (latest)
+- `dcf3513` fix: keep ayahs in place on pause; add Abdul Basit EveryAyah CDN; Moroccan flag; minify for mobile
