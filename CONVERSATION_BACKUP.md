@@ -168,6 +168,13 @@ e765741 fix: remove old audio module, fix highlightAyah conflict
 - `48d845e` Add copy-to-clipboard button for tafsir; update primary CDN URL to quran/tafseer-data (pushed to origin/main)
 - `c0b4705` Tafsir: make Quran.com API primary, use qurancdn API as fallback (drop dead jsDelivr CDN) (pushed to origin/main)
 - `ea65529` Tafsir UX: strip HTML tags, auto-close other open tafsirs, hide copy button on close (pushed to origin/main)
+- `d1a2026` Fix as-Sudais/Shuraim reciter: use 64kbps audio (only bitrate available on CDN) (pushed to origin/main)
+
+### Shuraim (الشريم) audio fix (Session 9 continued)
+- User reported reciter `ar.saoodshuraym` (Saood bin Ibraaheem Ash-Shuraym) no longer plays.
+- Root cause: `cdn.islamic.network/quran/audio/128/ar.saoodshuraym/{ayah}.mp3` returns S3 AccessDenied (403) — the files only exist at **64kbps**. Confirmed by `cdn.alquran.cloud` itself redirecting to `/quran/audio/64/ar.saoodshuraym/...`.
+- Fix (`d1a2026`): `getAudioUrl()` now picks `64` for `ar.saoodshuraym`, else `128`. All other reciters unaffected (verified `ar.husary`, `ar.minshawi`, `ar.hudhaify` OK at 128).
+- Redeployed: Pages ✅, Vercel ✅, Workers ✅ (Version ID `de5af514-a71d-45b9-a09c-d2ec2ec4e059`; needed `rm -rf .wrangler` first — stale cache caused a spurious permission error).
 
 ### Tafsir tweaks (Session 9 continued, after the URL swap)
 - `c0b4705` Tafsir: **Quran.com API is now PRIMARY** (`api.quran.com/api/v4/tafsirs/ar-tafsir-ibn-kathir/by_ayah/{s}:{a}`), fallback = `api.qurancdn.com/api/qdc/tafsirs/...` (tested HTTP 200, real Ibn Kathir). Dropped the two dead jsDelivr CDN repos (both 404).
