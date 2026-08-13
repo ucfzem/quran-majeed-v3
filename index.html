@@ -2352,6 +2352,7 @@ document.addEventListener('click',e=>{if(!e.target.closest('#reciterBtn')&&!e.ta
 
 
 let playQueue=[],playIndex=-1,isPlaying=false,playingBismillah=false;
+let playToken=0;
 let continuousMode=localStorage.getItem('continuousMode')==='1';
 let playerAudio=new Audio(),preloadAudio=new Audio();
 let playbackSpeeds=[0.75,1.0,1.25],speedIndex=1;
@@ -2413,6 +2414,7 @@ function seekAyah(e){if(!playQueue.length)return;const wrap=e.currentTarget;cons
 function updateProgress(){if(!playQueue.length)return;const pct=((playIndex+1)/playQueue.length)*100;document.getElementById('apbProgress').style.width=pct+'%';}
 async function playAyah(index){
   if(index<0||index>=playQueue.length){stopAudioPlayback();return;}
+  const token=++playToken;
   playIndex=index;const{surah,ayah,elId}=playQueue[index];
   document.getElementById('audioPlayerBar').classList.add('show');
   document.getElementById('apbInfo').textContent='آية '+ayah+' / '+playQueue.length;
@@ -2421,20 +2423,25 @@ async function playAyah(index){
     playingBismillah=true;
     try{
       playerAudio.src=await getAyahUrl(1,1,selectedReciter);playerAudio.playbackRate=playbackSpeeds[speedIndex];
+      if(token!==playToken)return;
       await playerAudio.play();isPlaying=true;
+      if(token!==playToken)return;
       document.getElementById('apbPlayBtn').textContent='⏸';
       document.getElementById('apbInfo').textContent='بسم الله — آية 1 / '+playQueue.length;
-      highlightActiveAyah(elId);startNoSleep();
+      if(token===playToken)highlightActiveAyah(elId);
+      startNoSleep();
       return;
     }catch(e){}
   }
   playingBismillah=false;
   try{
     playerAudio.src=await getAyahUrl(surah,ayah,selectedReciter);playerAudio.playbackRate=playbackSpeeds[speedIndex];
+    if(token!==playToken)return;
     await playerAudio.play();isPlaying=true;
+    if(token!==playToken)return;
     document.getElementById('apbPlayBtn').textContent='⏸';
     highlightActiveAyah(elId);preloadNextAyah(index+1);updateMediaSession(ayah);requestWakeLock();startNoSleep();
-  }catch(e){playAyah(index+1);}
+  }catch(e){if(token===playToken)playAyah(index+1);}
 }
 async function preloadNextAyah(index){
   if(index>=playQueue.length)return;const{surah,ayah}=playQueue[index];
@@ -2446,11 +2453,13 @@ function highlightActiveAyah(elId){
   if(el){el.classList.add('active-ayah');el.scrollIntoView({behavior:'smooth',block:'center'});}
 }
 playerAudio.addEventListener('ended',async()=>{
+  if(!isPlaying)return;
   if(playingBismillah){
     playingBismillah=false;
     const{surah,ayah,elId}=playQueue[playIndex];
     try{
       playerAudio.src=await getAyahUrl(surah,ayah,selectedReciter);playerAudio.playbackRate=playbackSpeeds[speedIndex];
+      if(!isPlaying)return;
       await playerAudio.play();
       document.getElementById('apbPlayBtn').textContent='⏸';
       highlightActiveAyah(elId);preloadNextAyah(playIndex+1);
@@ -2459,6 +2468,7 @@ playerAudio.addEventListener('ended',async()=>{
   }
   if(playIndex+1>=playQueue.length&&continuousMode&&currentSurah<114){
     try{
+      if(!isPlaying)return;
       await _origLoadSurah(currentSurah+1);
       await new Promise(r=>setTimeout(r,200));
       buildPlayQueue();
@@ -2470,12 +2480,19 @@ playerAudio.addEventListener('ended',async()=>{
 });
 function toggleAudioPlayback(){
   if(!playerAudio.src)return;
-  if(isPlaying){playerAudio.pause();isPlaying=false;document.getElementById('apbPlayBtn').textContent='▶️';}
+  if(isPlaying){
+    playToken++;
+    playerAudio.pause();isPlaying=false;
+    document.getElementById('apbPlayBtn').textContent='▶️';
+    const sx=window.scrollX,sy=window.scrollY;
+    window.scrollTo(sx,sy);
+  }
   else{playerAudio.play();isPlaying=true;document.getElementById('apbPlayBtn').textContent='⏸';}
 }
 function playNextAyah(){playAyah(playIndex+1);}
 function playPrevAyah(){playAyah(playIndex-1);}
 function stopAudioPlayback(){
+  playToken++;
   playerAudio.pause();isPlaying=false;playingBismillah=false;
   document.querySelectorAll('.ayah-block.active-ayah').forEach(el=>el.classList.remove('active-ayah'));
   try{if(bgOsc){bgOsc.stop();bgOsc.disconnect();bgOsc=null;}}catch(e){}
