@@ -148,5 +148,27 @@ e765741 fix: remove old audio module, fix highlightAyah conflict
 - Cloudflare Workers: https://quran-majeed.azer-tyu199p.workers.dev
 - Conversation backup: https://github.com/ucfzem/quran-majeed-v3/blob/main/CONVERSATION_BACKUP.md
 
+## Session 9 — Bottom progress bar shows global surah progress (2026-08-13)
+
+### Problem
+- Bottom audio progress bar (`apbProgress`) restarted at 0% on every ayah because each ayah is a separate MP3 and `audioObj.ontimeupdate` computed per-ayah progress (`currentTime / duration`).
+- User requested: "Affiche la progression globale de tout le fichier audio de la Sourate Al-Baqara" (global progress across the whole surah).
+
+### Solution
+- Kept the per-ayah streaming engine (reciters supply per-ayah MP3s) but changed the bar math to **cumulative surah progress**:
+  - `pct = (currentAyahIndex + currentTime/duration) / currentSurahAyahs.length * 100`
+  - The bar now advances continuously within each ayah and keeps going across ayahs without resetting.
+- Rewrote `seekAyah(e)` to map the click fraction to a surah-wide position:
+  - `pos = frac * currentSurahAyahs.length` → jump to that ayah's number; if clicking within the currently playing ayah, seek inside it (`currentTime = (pos - idx) * duration`), otherwise `playAyahAudio(currentSurah, ayahNum)`.
+- Re-minified (Terser compress, mangle off + clean-css). Post-minify JS syntax validated with `new Function`; all key functions (`playAyahAudio`, `getAudioUrl`, `toggleAudioPlayback`, `seekAyah`, `skipAyahs`, `toggleContinuous`, `cycleSpeed`, …) confirmed present. Build ~74,513 chars / 76,771 bytes.
+
+### Git log (new)
+- `6a7918e` Fix bottom progress bar to show global surah progress instead of per-ayah progress (pushed to origin/main)
+
+### Deployment status (2026-08-13)
+- GitHub Pages: HTTP 200 — serves new build, marker `currentSurahAyahs.length||1` confirmed ✅
+- Vercel: HTTP 200 — serves new build, marker confirmed ✅
+- Cloudflare Workers: ⚠️ NOT redeployed — no `CLOUDFLARE_API_TOKEN` in environment. Needs the user's CF token to run `wrangler deploy`.
+
 ### Security note
 - The GitHub token (x-access-token) is embedded in the credentialed clone's `.git/config` remote URL. Recommended to rotate it if that machine is not fully trusted.
