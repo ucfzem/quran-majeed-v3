@@ -1,4 +1,4 @@
-const CACHE_NAME = 'quran-majeed-v2';
+const CACHE_NAME = 'quran-majeed-v3';
 const STATIC_ASSETS = ['/'];
 
 self.addEventListener('install', e => {
@@ -23,6 +23,22 @@ self.addEventListener('fetch', e => {
     return;
   }
 
+  // Navigation: always try the network first so new deployments are picked up.
+  // Fall back to the cached page only when offline.
+  if (e.request.mode === 'navigate' || e.request.destination === 'document') {
+    e.respondWith(
+      fetch(e.request)
+        .then(res => {
+          const copy = res.clone();
+          caches.open(CACHE_NAME).then(c => c.put(e.request, copy)).catch(() => {});
+          return res;
+        })
+        .catch(() => caches.match(e.request).then(cached => cached || Response.error()))
+    );
+    return;
+  }
+
+  // Other same-origin assets: cache-first
   e.respondWith(
     caches.match(e.request).then(cached => cached || fetch(e.request))
   );

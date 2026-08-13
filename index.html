@@ -2516,7 +2516,7 @@ window.onload = function() {
 
 
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('sw.js?v=4').catch(function() {});
+    navigator.serviceWorker.register('sw.js?v=5').catch(function() {});
     navigator.serviceWorker.getRegistrations().then(function(regs) {
       regs.forEach(function(r) { r.update(); });
     });
