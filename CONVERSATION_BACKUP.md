@@ -120,6 +120,8 @@ e765741 fix: remove old audio module, fix highlightAyah conflict
 
 ### Git Log (pushed)
 - `c962dac` fix: keep ayahs in place on pause; Abdul Basit EveryAyah CDN; Moroccan flag; minify for mobile (pushed to origin/main)
+- `1e2f350` docs: full conversation backup session 8
+- `96d56ca` docs: cloudflare workers deployed via wrangler
 
 ### Deployment status (verified 2026-08-13)
 - GitHub Pages: HTTP 200 — serves new minified build (74,179 bytes), Moroccan flag + EveryAyah CDN confirmed ✅
