@@ -269,3 +269,42 @@ e765741 fix: remove old audio module, fix highlightAyah conflict
 
 ### Cloudflare deployment note (Session 10)
 - A new CF API token (`cfut_...`) was pasted in chat for this deploy; used only as an env var for `wrangler deploy`, never written to any file. **Recommendation: rotate it** on dash.cloudflare.com since it has now appeared in chat.
+
+---
+
+## Session 11 — 2026-08-14 (Tafsir 3-URL fallback, CSS Grid feature cards)
+
+### 1. Tafsir 3-URL fallback chain (`toggleTafsir`)
+- Replaced the 2-URL nested `try/catch` fetch chain with a clean 3-URL array + unified `extract()` helper:
+  1. `https://api.quran.com/api/v4/tafsirs/ar-tafsir-ibn-kathir/by_ayah/{s}:{a}` — **primary**, Arabic Ibn Kathir
+  2. `https://api.quran.com/api/v4/tafsirs/168/by_ayah/{s}:{a}` — **fallback**, English Ibn Kathir (ID 168)
+  3. `https://api.qurancdn.com/api/qdc/tafsirs/ar-tafsir-ibn-kathir/by_ayah/{s}:{a}` — **fallback**, Arabic
+- `extract(t)` handles both response shapes (`t.tafsir.text` and `t.tafsirs[0].text`), throws on missing/empty text so the `for...of` loop falls through to the next URL automatically. Keeps the existing `clean()` (strip HTML + `قول تعالى → قوله تعالى`).
+- ⚠️ **Verified live**: the originally proposed URL `api.quran.com/api/v4/quran/tafsirs/168?verse_key=2:255` returns HTTP 200 with an **empty `tafsirs` array** — the `throw` catches it and falls back cleanly (no crash). The corrected form `/tafsirs/168/by_ayah/2:255` returns 200 with `tafsir.text` (English, 10 379 chars).
+- **Language priority**: URLs 1 & 3 are Arabic-first, so users get Arabic text ~99% of the time; the English ID-168 URL is only a last-resort fallback.
+- Commit `8ef4d92`.
+
+### 2. CSS Grid for homepage feature cards (`.features-grid` / `.feature-card`)
+- Old: `grid-template-columns:repeat(auto-fit,minmax(140px,1fr))` capped at `max-width:500px` → on large screens it produced "3 cards on top, 1 isolated below".
+- New: fixed 2-column grid on mobile, forced 4-column single row on TV/desktop:
+  - Base: `.features-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;margin-top:30px;max-width:500px;margin-inline:auto}` → **2×2** on mobile
+  - `@media (min-width:1024px){.features-grid{grid-template-columns:repeat(4,1fr);max-width:900px;gap:20px}.feature-card{padding:20px;font-size:1.1rem}}` → **1×4** on TV/desktop
+- The 4 cards (📖 f1, 🌍 f2, 🌙 f3, 🔍 f4) are already inside the `.features-grid` container; no DOM changes needed. Commit `8ef4d92`.
+
+### Git log (Session 11, pushed to origin/main)
+- `8ef4d92` fix: CSS Grid 2x2 mobile / 1x4 TV for feature cards + 3rd Ibn Kathir tafsir fallback URL
+
+### Deployment status (verified 2026-08-14)
+- GitHub Pages: HTTP 200 — markers `repeat(4,1fr)` + `repeat(2,1fr)` + `tafsirs/168/by_ayah` confirmed ✅
+- Vercel: HTTP 200 — same markers confirmed ✅ (deployment `dpl_87CJ2gG3bEsvebqBQv28aKVr9Pso`)
+- Cloudflare Workers: ✅ redeployed (Version ID `bd77349a-b89d-446a-8a33-0a69cf44301c`), HTTP 200, markers confirmed. All three deployments now identical.
+
+### Links (all)
+- Repo: https://github.com/ucfzem/quran-majeed-v3
+- GitHub Pages: https://ucfzem.github.io/quran-majeed-v3/
+- Vercel: https://quran-majeed-v3.vercel.app
+- Cloudflare Workers: https://quran-majeed.azer-tyu199p.workers.dev
+- Conversation backup: https://github.com/ucfzem/quran-majeed-v3/blob/main/CONVERSATION_BACKUP.md
+
+### Cloudflare deployment note (Session 11)
+- Same `cfut_...` token used via env var for `wrangler deploy` (Version ID above). **Still recommended: rotate it** on dash.cloudflare.com since it has appeared in chat.
