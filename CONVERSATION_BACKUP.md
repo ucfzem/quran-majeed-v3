@@ -372,3 +372,28 @@ e765741 fix: remove old audio module, fix highlightAyah conflict
 - Vercel: https://quran-majeed-v3.vercel.app
 - Cloudflare Workers: https://quran-majeed.azer-tyu199p.workers.dev
 - Conversation backup: https://github.com/ucfzem/quran-majeed-v3/blob/main/CONVERSATION_BACKUP.md
+
+---
+
+# Session 12 (suite) — Default UI language = Arabic (Moroccan flag)
+
+## 5. Default language fix (commit `29663c6`)
+- **Request**: on first open of the page, the default UI language must be Arabic (🇲🇦 Moroccan flag), not American/English.
+- **Change** (one line in `index.html`):
+  - `currentLang=localStorage.getItem("quran_lang")||"en.sahih"` → `currentLang=localStorage.getItem("quran_lang")||"ar"`
+- `ar` maps to `{code:"ar",label:"🇲🇦 العربية (Arabic)",ui:"ar"}` in `LANGUAGES` — Moroccan flag, Arabic UI (RTL), translation hidden, Arabic search edition.
+- Note: `localStorage.getItem("quran_lang")` still wins if the user previously chose a language — the `"ar"` fallback applies to fresh visitors / cleared storage.
+- Validated: both `<script>` blocks parse; marker `currentLang=localStorage.getItem("quran_lang")||"ar"` confirmed in source.
+
+## 6. Deployment status (verified 2026-08-14, after `29663c6`)
+- GitHub Pages: HTTP 200 — markers `normalizerTexteCoran` ✓ `default ar` ✓
+- Vercel: HTTP 200 — markers ✓ (deployment `dpl_F5CaDuVsYgobtsSLPXtviUuPHYDs`)
+- Cloudflare Workers: HTTP 200 — markers ✓ (Version ID `dbdd5048-b05f-4798-8dd1-6947b2bc3da5`)
+- All three identical.
+
+### Links (all)
+- Repo: https://github.com/ucfzem/quran-majeed-v3
+- GitHub Pages: https://ucfzem.github.io/quran-majeed-v3/
+- Vercel: https://quran-majeed-v3.vercel.app
+- Cloudflare Workers: https://quran-majeed.azer-tyu199p.workers.dev
+- Conversation backup: https://github.com/ucfzem/quran-majeed-v3/blob/main/CONVERSATION_BACKUP.md
