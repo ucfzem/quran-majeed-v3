@@ -308,3 +308,18 @@ e765741 fix: remove old audio module, fix highlightAyah conflict
 
 ### Cloudflare deployment note (Session 11)
 - Same `cfut_...` token used via env var for `wrangler deploy` (Version ID above). **Still recommended: rotate it** on dash.cloudflare.com since it has appeared in chat.
+
+### 3. Tafsir text-quality fixes in `clean()` (Session 11 continued)
+- Added to the `clean()` helper inside `toggleTafsir` (runs on every tafsir text before display, on both Arabic URLs and the cache path):
+  1. `replace(/قول تعالى/g,"قوله تعالى")` — fixes the incomplete common form.
+  2. `replace("ا ل م ص ر ك ي ع ط س ح ق ن","ا ل م ص ر ك ه ي ع ط س ح ق ن")` — **restores the missing « هـ »** in the list of the 14 muqatta'at letters. Seen in the Ibn Kathir tafsir of 2:1: the sentence announces "أربعة عشر حرفا" (14 letters) but the API text lists only 13 (omits ه). The printed reference (Dār Taybah) has `ا ل م ص ر ك ه ي ع ط س ح ق ن` — verified the target string appears exactly once in the live API text (context: "…بحذف المكرر منها أربعة عشر حرفا ، وهي : ا ل م ص ر ك ي ع ط س ح ق ن ، يجمعها قولك : نص حكيم قاطع له سر…").
+- Verified end-to-end against `api.quran.com .../by_ayah/2:1`: after `clean()`, the 14-letter list is present, the 13-letter (bug) form is gone, and « قول تعالى » is gone.
+- Note: only the JS `clean()` is modified; no edits to religious content beyond restoring the obvious API typo the user explicitly requested.
+
+### Git log (Session 11 continued, pushed)
+- `55420ed` fix: restore missing ha' in 14 muqatta'at letters list (Ibn Kathir tafsir)
+
+### Deployment status (verified 2026-08-14, after `55420ed`)
+- GitHub Pages: HTTP 200 — marker `replace("ا ل م ص ر ك ي ع ط س ح ق ن",...` present ✅
+- Vercel: HTTP 200 — marker present ✅ (deployment `dpl_2ZHub2SSFjtgyVZb791cpr1EvfrT`)
+- Cloudflare Workers: ✅ redeployed (Version ID `0ac30c61-f19a-46ba-b1c7-09413daeef97`), HTTP 200, marker present. All three identical.
