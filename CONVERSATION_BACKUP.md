@@ -216,3 +216,56 @@ e765741 fix: remove old audio module, fix highlightAyah conflict
 
 ### Security note
 - The GitHub token (x-access-token) is embedded in the credentialed clone's `.git/config` remote URL. Recommended to rotate it if that machine is not fully trusted.
+
+---
+
+## Session 10 — 2026-08-14 (TV mode, Arabic labels, tafsir auto-correction)
+
+### 1. TV / Large-screen mode (`@media (min-width: 1200px)`)
+- User supplied a generic French-class CSS fix; mapped onto the real app selectors:
+  - `.audio-player-bar` → larger padding (16px 24px)
+  - `.apb-info` → 1.2rem, more margin
+  - `.apb-progress-wrap` → 8px tall progress bar
+  - `.apb-btn` / `.apb-btn.play` → bigger control buttons (1.8rem / 2.4rem)
+  - `.apb-speed` → larger
+  - `.ayah-tafsir-content` → tafsir text 1.4rem, line-height 2
+
+### 2. Moroccan flag stays visible in RTL (Arabic mode)
+- `#langBtn` now has `class="lang-flag-container"` (`display:inline-flex; align-items:center; justify-content:center; direction:ltr`) so the flag can't be mirrored/hidden when the page is `dir="rtl"`.
+- The flag emoji is isolated in `<span class="flag-icon">` and the label in `<span id="langBtnLabel">`; `updateLangBtnLabel()` fills both spans separately.
+- `.flag-icon` uses `font-size:clamp(1rem, 4vw, 22px)` (brand-new flag stays proportional on mobile).
+
+### 3. Arabic player bar + tafsir/copy labels (via existing i18n `t()`)
+- User supplied a hardcoded Arabic HTML/JS snippet (`سورة البقرة — الآية`, `تفسير 📚`, `📋 نسخ`, `✅ تم النسخ`); mapped onto the app's i18n system instead so every UI language works.
+- New i18n keys added to `en` / `fr` / `ar` blocks: `surah`, `verse`, `tafsir`, `copy`, `copied`, `copyFail`.
+- Player bar (`playAyahAudio` → `apbInfo`):
+  - Arabic: `سورة البقرة — الآية 49` (uses `surahObj.name`)
+  - French: `Al-Baqara — Verset 49` · English: `Al-Baqara — Verse 49`
+- Tafsir button: `📚 Tafsir` → `📚 ${t("tafsir")}` → **📚 تفسير** in Arabic.
+- Copy button: `📋 Copier` → `📋 نسخ` in Arabic (`t("copy")`).
+- Copy feedback: `✅ Copié !` → **✅ تم النسخ** (ar), failure `❌ Échec` → **❌ فشل النسخ** (ar).
+- Labels refresh automatically because `selectLanguage()` → `loadSurah()` re-renders the surah view.
+
+### 4. Tafsir auto-correction `قول تعالى` → `قوله تعالى`
+- User reported the API text occasionally contains the typo/incomplete « قول تعالى ».
+- Added `.replace(/قول تعالى/g,"قوله تعالى")` to the existing `clean()` helper inside `toggleTafsir()`, so both the primary (`api.quran.com`) and fallback (`api.qurancdn.com`) paths, plus the cache write, are corrected before display.
+
+### Git log (Session 10, pushed to origin/main)
+- `3f0c62a` fix: auto-correct "قول تعالى" to "قوله تعالى" in tafsir text
+- `780fadf` fix: TV large-screen media query + Arabic surah/verse/tafsir/copy labels via i18n
+- Prior to these, Session 10 also restored the tracked `.wrangler/cache/wrangler-account.json` (cache file, kept in git to keep the diff clean).
+
+### Deployment status (verified 2026-08-14)
+- GitHub Pages: HTTP 200 — serves new build (correction + all markers) ✅
+- Vercel: HTTP 200 — serves new build, deployment `dpl_gCqifccw8BsQ5XrbhX7ygqhk2kt9` ✅
+- Cloudflare Workers: ✅ deployed via `wrangler deploy` (Version ID `35a6fcfb-9d40-49a8-8deb-83f67fd2c00e`), HTTP 200, markers confirmed. All three deployments now identical.
+
+### Links (all)
+- Repo: https://github.com/ucfzem/quran-majeed-v3
+- GitHub Pages: https://ucfzem.github.io/quran-majeed-v3/
+- Vercel: https://quran-majeed-v3.vercel.app
+- Cloudflare Workers: https://quran-majeed.azer-tyu199p.workers.dev
+- Conversation backup: https://github.com/ucfzem/quran-majeed-v3/blob/main/CONVERSATION_BACKUP.md
+
+### Cloudflare deployment note (Session 10)
+- A new CF API token (`cfut_...`) was pasted in chat for this deploy; used only as an env var for `wrangler deploy`, never written to any file. **Recommendation: rotate it** on dash.cloudflare.com since it has now appeared in chat.
