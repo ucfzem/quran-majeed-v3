@@ -323,3 +323,52 @@ e765741 fix: remove old audio module, fix highlightAyah conflict
 - GitHub Pages: HTTP 200 — marker `replace("ا ل م ص ر ك ي ع ط س ح ق ن",...` present ✅
 - Vercel: HTTP 200 — marker present ✅ (deployment `dpl_2ZHub2SSFjtgyVZb791cpr1EvfrT`)
 - Cloudflare Workers: ✅ redeployed (Version ID `0ac30c61-f19a-46ba-b1c7-09413daeef97`), HTTP 200, marker present. All three identical.
+
+---
+
+# Session 12 — Tafsir Audit + Module Refactor + Endpoint Verification
+
+## 1. Full Tafsir corpus audit (114 surahs, 6,205 verses)
+
+### Method
+- Wrote `/tmp/opencode/audit_tafsir.js`: loops surahs 1–114, uses the **bulk endpoint** `https://api.quran.com/api/v4/tafsirs/ar-tafsir-ibn-kathir/by_chapter/{n}?per_page=300&page=1` (1 request per surah, 114 total instead of 6,236 via by_ayah).
+- `per_page=300` returns the whole surah (e.g. S2 = 286 records) with `total_pages:1`.
+- Each record: `{id, resource_id, verse_key, language_id, text (HTML), slug}`.
+- Content checks applied to cleaned text (strip HTML → apply قول تعالى/هـ fixes): empty text, `[a-zA-Z]{5,}` contamination, presence of `قول تعالى`, presence of the 13-letter bug list `ا ل م ص ر ك ي ع ط س ح ق ن`.
+
+### Results
+- 114/114 surahs, 6,205 verses analyzed.
+- **0 empty**, **0 English contamination**, **0 `قول تعالى`**, **0 13-letter bug list** → the two `cleanTafsirText` fixes are now a safety net (API no longer exhibits them), kept as-is.
+- 19 structural "count" anomalies: API's `by_chapter` omits some verses that have no dedicated tafsir record:
+  - 16 surahs: exactly −1 verse (basmala not counted as a tafsir record) — S5, 6, 11, 30, 33, 37, 38, 42, 43, 47, 53, 54, 75, 86, ...
+  - S26: −8 (104,159,164,174,175,178,179,180); S74: −3 (15,32,46); S77: −3 (14,18,23); S20: −2.
+- Note: could not re-confirm the missing verses via `by_ayah` — api.quran.com went 503 (rate-limited) right after the 114-request burst; recovered later.
+
+## 2. Module refactor — named functions (commit `bdcf70b`)
+- Replaced the inline `const clean=t=>...` inside `toggleTafsir` with a named, standalone:
+  - `cleanTafsirText(rawText)` — strips HTML `/<[^>]*>?/gm`, fixes `قول تعالى→قوله تعالى`, restores the missing `هـ` in the 14 muqatta'at letters (`ا ل م ص ر ك ي ع ط س ح ق ن` → `ا ل م ص ر ك ه ي ع ط س ح ق ن`), then `.trim()`.
+  - `normalizerTexteCoran(text)` — Quranic rasm normalizer for search: `ءَا→آ`, `[أإآٱ]→ا`, dagger alef `ٰ→ا`, strips silah `[ۦۥ]`, strips tashkeel `[\u064B-\u0652]`, trims. Display text untouched.
+- `return clean(raw)` → `return cleanTafsirText(raw)` inside the `extract()` helper.
+- Validated: both `<script>` blocks parse via `new Function`; unit-tested all paths (HTML strip, قول fix, هـ fix, trim, normalizer: `وَبِٱلْءَاخِرَةِ→وبالاخرة`, `ءَايَةٌ→اية`, empty-string guards).
+
+## 3. Endpoint routing verification (do NOT use /resources/...)
+- User proposed substituting `/by_ayah/` with `/resources/tafsirs/.../ayah/`. **Rejected after live tests + official docs**:
+  - `api.quran.com/api/v4/resources/tafsirs/168/ayah/2:255` → **404**
+  - `api.quran.com/api/v4/resources/tafsirs/168/by_ayah/2:255` → **404**
+  - `api.quran.com/api/v4/tafsirs/168/by_ayah/2:255` → **200** ✅ (current, correct)
+  - `.../tafsirs/ar-tafsir-ibn-kathir/by_ayah/2:255` → **200** ✅
+- Official spec (https://api-docs.quran.foundation/docs/content_apis_versioned/4.0.0/tafsir/): `/resources/tafsirs` is the **catalog/metadata listing** endpoint; the **content** endpoint is `/tafsirs/{tafsir_id}/by_ayah/{ayah_key}`.
+- Conclusion: current code already matches the v4 spec exactly; **no change applied**.
+
+## 4. Deployment status (verified 2026-08-14, after `bdcf70b`)
+- GitHub Pages: HTTP 200 — markers `function cleanTafsirText` ✓ `function normalizerTexteCoran` ✓
+- Vercel: HTTP 200 — markers ✓ (deployment `dpl_4NAMMxLH9AL43PN8fBaGUQNBP1Z3`)
+- Cloudflare Workers: HTTP 200 — markers ✓ (Version ID `17f38ede-ff13-46ff-91d3-29152b6cb4a9`)
+- All three identical.
+
+### Links (all)
+- Repo: https://github.com/ucfzem/quran-majeed-v3
+- GitHub Pages: https://ucfzem.github.io/quran-majeed-v3/
+- Vercel: https://quran-majeed-v3.vercel.app
+- Cloudflare Workers: https://quran-majeed.azer-tyu199p.workers.dev
+- Conversation backup: https://github.com/ucfzem/quran-majeed-v3/blob/main/CONVERSATION_BACKUP.md
