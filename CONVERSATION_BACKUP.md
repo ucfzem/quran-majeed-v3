@@ -397,3 +397,48 @@ e765741 fix: remove old audio module, fix highlightAyah conflict
 - Vercel: https://quran-majeed-v3.vercel.app
 - Cloudflare Workers: https://quran-majeed.azer-tyu199p.workers.dev
 - Conversation backup: https://github.com/ucfzem/quran-majeed-v3/blob/main/CONVERSATION_BACKUP.md
+
+---
+
+# Session 13 — Playable Basmala header audio (commit `a1efdff`)
+
+## Problem
+- The Basmala header (بسم الله الرحمن الرحيم) shown at the top of surahs 2–114 (except 9) had no audio: clicking it did nothing, and verse 1 audio (e.g. 2:1 "الم") does not include the Basmala (the API treats the Basmala as a separate pre-header, not verse 1, except in Al-Fatiha where it IS 1:1).
+
+## Solution
+- **Basmala audio = the 1:1 file** for the active reciter. `getAudioUrl(1,1)` already produces exactly that (`.../audio/{128|64}/{reciter}/1.mp3` via global ayah number 1, or `everyayah.com/data/{folder}/001001.mp3`), so no hardcoded reciter URL — the reciter selection is respected.
+- Verified live: `cdn.islamic.network/quran/audio/128/ar.alafasy/1.mp3` (146 KB), `ar.husary/1.mp3` (82 KB), everyayah `Abdul_Basit_Murattal_192kbps/001001.mp3` (104 KB) all → HTTP 200 audio/mpeg.
+
+## Changes in `index.html`
+1. **Basmala div is now clickable** in `renderSurahView`: `id="basmala-${number}"`, `class="basmala-header"`, `onclick="playBasmala(${number})"`, `cursor:pointer; user-select:none`, title=`t("play")`.
+2. **New `playBasmala(surahNum)`** function (before `playAyahAudio`):
+   - `surah===1` → `playAyahAudio(1,1)` (Basmala is verse 1 of Fatiha, no double play).
+   - `surah===9` → `playAyahAudio(9,1)` (At-Tawbah has no Basmala, start verse 1 directly).
+   - Otherwise → plays `getAudioUrl(1,1)` (the Basmala), highlights `.basmala-header.playing`, shows player bar with a "Basmala" label, and **on `onended` chains to `playAyahAudio(surahNum,1)`** (so 2:1 "الم" starts only after the Basmala finishes). Toggle logic (click again = pause) mirrors `playAyahAudio`.
+3. **New global state** `currentBasmalaSurah` (added to the global declarations) so toggling and cleanup are tracked; `closeAudioPlayer()` now also resets it and clears `.basmala-header.playing`.
+4. **`showAudioPlayerBar(surahNum,ayahNum,isBasmala)`** — third optional param; when true the bar label shows `t("basmala")` instead of "Verse N".
+5. **i18n key `basmala`**: en/fr "Basmala", ar "بسملة".
+6. **CSS**: `.basmala-header.playing{text-shadow:0 0 12px var(--gold);color:var(--gold-light)!important}` (next to `.ayah-block.playing`).
+
+## Validation
+- Both `<script>` blocks pass `new Function` parse.
+- Functional harness (mocked Audio/DOM) verified all paths:
+  - play(2) → `BAR 2:1 BASMALA`, `PLAY MOCK-1:1`, src=`MOCK-1:1`
+  - onended → `PLAYAYAH 2:1` (basmala→verse 1 chaining) and basmala state cleared
+  - surah 9 → `PLAYAYAH 9:1` directly (no basmala)
+  - surah 1 → `PLAYAYAH 1:1` directly (no duplicate)
+  - click again while playing → pause toggle
+- One gotcha fixed during dev: naive string-replace of `function playAyahAudio(` matched the substring inside `async function playAyahAudio(`, which moved the `async` keyword onto `playBasmala` and broke parsing — restored `async` on `playAyahAudio`.
+
+## Deployment status (verified 2026-08-14, after `a1efdff`)
+- GitHub Pages: HTTP 200 — markers `function playBasmala` ✓ `currentBasmalaSurah` ✓ `onclick="playBasmala(` ✓ `basmala:"Basmala"` ✓
+- Vercel: HTTP 200 — markers ✓ (deployment `dpl_HBEoTxswPfhvUTbR8Nu2FFFRCEzT`)
+- Cloudflare Workers: HTTP 200 — markers ✓ (Version ID `ce584905-8f7d-4799-abef-8ecb8ed1a386`)
+- All three identical.
+
+### Links (all)
+- Repo: https://github.com/ucfzem/quran-majeed-v3
+- GitHub Pages: https://ucfzem.github.io/quran-majeed-v3/
+- Vercel: https://quran-majeed-v3.vercel.app
+- Cloudflare Workers: https://quran-majeed.azer-tyu199p.workers.dev
+- Conversation backup: https://github.com/ucfzem/quran-majeed-v3/blob/main/CONVERSATION_BACKUP.md
