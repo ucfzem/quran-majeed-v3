@@ -442,3 +442,45 @@ e765741 fix: remove old audio module, fix highlightAyah conflict
 - Vercel: https://quran-majeed-v3.vercel.app
 - Cloudflare Workers: https://quran-majeed.azer-tyu199p.workers.dev
 - Conversation backup: https://github.com/ucfzem/quran-majeed-v3/blob/main/CONVERSATION_BACKUP.md
+
+---
+
+# Session 13 (suite) — Basmala definitive fix: promise queue + ayah-1 prepend (commits `733573e`, `b2e3ea7`)
+
+## Context
+User proposed a "bulletproof" queue fix. Investigation proved:
+- **The per-ayah Basmala file EXISTS**: `cdn.islamic.network/quran/audio/128/ar.alafasy/1.mp3` → HTTP 200 (146 KB, audio/mpeg). Same for `ar.husary` and everyayah `Abdul_Basit_Murattal_192kbps/001001.mp3`. The old `onended`-chained version did NOT have a missing-file problem.
+- **User's proposed whole-surah URL was 404**: `download.quranicaudio.com/quran/ar.alafasy/002.mp3` → 404 (and `alafasy` slug → 404 too). The working whole-surah endpoint is `cdn.islamic.network/quran/audio-surah/128/ar.alafasy/2.mp3` → 200 (6.9 MB, includes Basmala natively) — but it changes UX (whole surah plays at once, per-verse progress bar/highlight become meaningless).
+- User chose (via question) to **keep promise + verse 1 chaining** (per-ayah model consistent with existing player).
+
+## Changes
+1. **`playAudioAsync(url)`** — new helper returning a Promise: creates `new Audio(url)`, sets `playbackRate`, wires `audioObj`/`isPlaying`/progress bar, resolves on `onended` (audioObj=null), rejects on `onerror`/`play()` rejection.
+2. **`playBasmala(surahNum)` rewritten as `async`** — no more `onended` event chaining; uses `await playAudioAsync(getAudioUrl(1,1))` then chains `playAyahAudio(surahNum,1)`. Keeps toggle (re-click = pause), `.basmala-header.playing` highlight, scrollIntoView, BASMALA-labeled player bar. Error → `showAudioError` + `closeAudioPlayer`.
+3. **Manual click on ayah 1 now prepends Basmala** (user snippet's `getAyahAudioUrl` intent): `playAyahAudio(surahNum,ayahNum,skipBasmala)` redirects to `playBasmala(surahNum)` when `ayahNum===1 && surah not 1/9 && !skipBasmala`.
+4. **Anti-recursion `skipBasmala` flag**: `playBasmala` fast-path (surah 1/9) and the basmala→verse-1 chain both call `playAyahAudio(surahNum,1,!0)` so verse 1 never re-triggers a Basmala loop.
+5. **Surah-aware toggle** (fixed a latent bug): `playAyahAudio`'s pause-toggle now requires `currentSurah===surahNum` too, and the toggle check was moved BEFORE the basmala redirect — clicking ayah 1 of a *different* surah now switches playback instead of pausing. `__reset()` exposed in test harness to isolate state between tests.
+
+## Verification
+- Both `<script>` blocks parse via `new Function`.
+- Harness `test_basmala3.js` (extraction by braces, preserves `async` prefix; scoped bindings avoid `let` conflicts): **16/16 pass**:
+  - basmala header S2 → plays MOCK-1:1 with BASMALA bar
+  - onended → chains to 2:1, no re-trigger loop
+  - S9 header → direct 9:1 (no basmala)
+  - S1 header → direct 1:1
+  - manual ayah-1 click S2 → basmala then 2:1
+  - manual ayah-1 click S9 → direct 9:1
+  - ayah-2 click → normal 2:2
+  - re-click basmala while playing → pause toggle
+  - ayah-1 of another surah while playing → switches (not toggles)
+
+## Deployment (commit `b2e3ea7`, verified 2026-08-14)
+- GitHub Pages: HTTP 200, all 4 markers ✓
+- Vercel: HTTP 200, deployment `dpl_CgWvyJ1etYTkyDpE8aqiCL6ru6gs`, all markers ✓
+- Cloudflare Workers: HTTP 200, Version `9b43a108-b6e0-4cce-a99f-c0502a954693` (first deploy attempt errored; retry succeeded), all markers ✓
+
+### Links (all)
+- Repo: https://github.com/ucfzem/quran-majeed-v3
+- GitHub Pages: https://ucfzem.github.io/quran-majeed-v3/
+- Vercel: https://quran-majeed-v3.vercel.app
+- Cloudflare Workers: https://quran-majeed.azer-tyu199p.workers.dev
+- Conversation backup: https://github.com/ucfzem/quran-majeed-v3/blob/main/CONVERSATION_BACKUP.md
