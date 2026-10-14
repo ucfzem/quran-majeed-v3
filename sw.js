@@ -5,7 +5,7 @@
 // Audio and third-party analytics are left to the network (untouched) to avoid
 // breaking streaming / Range requests.
 
-const VERSION = 'v3';
+const VERSION = 'v4';
 const SHELL = 'qmv3-shell-' + VERSION;
 const DATA = 'qmv3-data-' + VERSION;
 
@@ -130,5 +130,17 @@ async function prefetchQuran() {
       }
     };
     await Promise.all(Array.from({ length: 4 }, worker));
+
+    let ti = 0;
+    const tWorker = async () => {
+      while (ti < nums.length) {
+        const n = nums[ti++];
+        const u = `https://api.quran.com/api/v4/tafsirs/ar-tafsir-ibn-kathir/by_chapter/${n}?per_page=300`;
+        const r = new Request(u);
+        if (await cache.match(r)) continue;
+        try { const res = await fetch(r); if (res && res.ok) await cache.put(r, res.clone()); } catch (e) {}
+      }
+    };
+    await Promise.all(Array.from({ length: 3 }, tWorker));
   } catch (e) {}
 }
