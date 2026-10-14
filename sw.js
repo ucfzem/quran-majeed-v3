@@ -5,11 +5,15 @@
 // Audio and third-party analytics are left to the network (untouched) to avoid
 // breaking streaming / Range requests.
 
-const VERSION = 'v2';
+const VERSION = 'v3';
 const SHELL = 'qmv3-shell-' + VERSION;
 const DATA = 'qmv3-data-' + VERSION;
 
-const SHELL_ASSETS = ['./', './index.html'];
+const SHELL_ASSETS = [
+  './',
+  './index.html',
+  'https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Inter:wght@400;600;700&family=Scheherazade+New:wght@400;700&display=swap'
+];
 const DATA_HOSTS = ['api.alquran.cloud', 'api.quran.com', 'api.qurancdn.com'];
 const FONT_HOSTS = ['fonts.googleapis.com', 'fonts.gstatic.com'];
 
@@ -114,9 +118,15 @@ async function prefetchQuran() {
     const worker = async () => {
       while (i < nums.length) {
         const n = nums[i++];
-        const r = new Request(`https://api.alquran.cloud/v1/surah/${n}/quran-uthmani`);
-        if (await cache.match(r)) continue;
-        try { const res = await fetch(r); if (res && res.ok) await cache.put(r, res.clone()); } catch (e) {}
+        const endpoints = [
+          `https://api.alquran.cloud/v1/surah/${n}/ar`,
+          `https://api.alquran.cloud/v1/surah/${n}/quran-uthmani`
+        ];
+        for (const u of endpoints) {
+          const r = new Request(u);
+          if (await cache.match(r)) continue;
+          try { const res = await fetch(r); if (res && res.ok) await cache.put(r, res.clone()); } catch (e) {}
+        }
       }
     };
     await Promise.all(Array.from({ length: 4 }, worker));
